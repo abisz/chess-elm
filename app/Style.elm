@@ -2,8 +2,10 @@ module Style exposing (..)
 
 import Color
 
+
 whiteColor =
-  Color.white
+    Color.white
+
 
 blackColor =
-  Color.black
+    Color.black
