@@ -21,10 +21,21 @@ type alias Field =
     }
 
 
+type Selection
+    = None
+    | Active Field
+
+
 type alias Model =
     { restart : Bool
     , board : Matrix Field
+    , selected : Selection
     }
+
+
+fieldToText : Field -> String
+fieldToText field =
+    toString (row field.loc) ++ " / " ++ toString (Matrix.col field.loc)
 
 
 getFigureColor : Location -> Color
@@ -41,11 +52,13 @@ model =
     , board =
         square 8 <|
             (\l -> { color = (getFigureColor l), loc = l, figure = { class = "_" } })
+    , selected = None
     }
 
 
 type Msg
     = Restart
+    | SelectField Field
 
 
 update : Msg -> Model -> Model
@@ -54,14 +67,20 @@ update msg model =
         Restart ->
             { model | restart = True }
 
+        SelectField field ->
+            { model | selected = (Active field) }
 
-drawField : Field -> Html div
+
+drawField : Field -> Html Msg
 drawField field =
-    Html.div [ (Style.fieldStyles field.color) ]
-        [ text (toString (row field.loc) ++ "/" ++ toString (Matrix.col field.loc)) ]
+    Html.div
+        [ (Style.fieldStyles field.color)
+        , onClick (SelectField field)
+        ]
+        [ text (fieldToText field) ]
 
 
-drawBoard : Matrix Field -> Html div
+drawBoard : Matrix Field -> Html Msg
 drawBoard board =
     Matrix.map drawField board
         |> flatten
@@ -73,10 +92,20 @@ view model =
     let
         board =
             drawBoard model.board
+
+        selection =
+            (case model.selected of
+                None ->
+                    "No Selection"
+
+                Active field ->
+                    fieldToText field
+            )
     in
         div []
             [ h1 [ style [ ( "color", colorToCssString Style.blackColor ) ] ] [ text ("Elm Chess") ]
             , button [ onClick Restart ] [ text "Restart" ]
+            , text ("Selected: " ++ selection)
             , board
             ]
 
