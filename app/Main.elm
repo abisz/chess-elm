@@ -3,26 +3,45 @@ module Main exposing (..)
 import Html exposing (..)
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
-import Color exposing (Color)
 import Matrix exposing (..)
-import Style exposing (..)
-
-
-type alias Model =
-    { restart : Bool }
+import Style
+import Color exposing (Color)
+import Helper exposing (..)
 
 
 type alias Figure =
-    { class : String }
+    { class : String
+    }
 
 
 type alias Field =
-    { figure : Figure }
+    { loc : Location
+    , color : Color
+    , figure : Figure
+    }
+
+
+type alias Model =
+    { restart : Bool
+    , board : Matrix Field
+    }
+
+
+getFigureColor : Location -> Color
+getFigureColor loc =
+    if (((row loc) % 2) == ((Matrix.col loc) % 2)) then
+        Style.blackColor
+    else
+        Style.whiteColor
 
 
 model : Model
 model =
-    { restart = False }
+    { restart = False
+    , board =
+        square 8 <|
+            (\l -> { color = (getFigureColor l), loc = l, figure = { class = "_" } })
+    }
 
 
 type Msg
@@ -36,13 +55,30 @@ update msg model =
             { model | restart = True }
 
 
+drawField : Field -> Html div
+drawField field =
+    Html.div [ (Style.fieldStyles field.color) ]
+        [ text (toString (row field.loc) ++ "/" ++ toString (Matrix.col field.loc)) ]
+
+
+drawBoard : Matrix Field -> Html div
+drawBoard board =
+    Matrix.map drawField board
+        |> flatten
+        |> Html.div []
+
+
 view : Model -> Html Msg
 view model =
-    div []
-        [ h1 [ style [ ( "color", colorToCssString blackColor ) ] ] [ text ("Elm Chess") ]
-        , button [ onClick Restart ] [ text "Restart" ]
-        , div [] []
-        ]
+    let
+        board =
+            drawBoard model.board
+    in
+        div []
+            [ h1 [ style [ ( "color", colorToCssString Style.blackColor ) ] ] [ text ("Elm Chess") ]
+            , button [ onClick Restart ] [ text "Restart" ]
+            , board
+            ]
 
 
 main =
@@ -51,20 +87,3 @@ main =
         , update = update
         , view = view
         }
-
-
-colorToCssString : Color -> String
-colorToCssString color =
-    let
-        components =
-            Color.toRgb color
-    in
-        String.concat
-            [ "rgb("
-            , toString components.red
-            , ", "
-            , toString components.green
-            , ", "
-            , toString components.blue
-            , ")"
-            ]
