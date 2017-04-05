@@ -176,8 +176,73 @@ selectField model clickedField =
             }
 
 
+moveFigure : Model -> Field -> Model
+moveFigure model targetField =
+    let
+        isSelected =
+            case model.selected of
+                None ->
+                    False
+
+                Active activeField ->
+                    True
+
+        updatedBoard =
+            case model.selected of
+                None ->
+                    model.board
+
+                Active playerField ->
+                    Matrix.map
+                        (\f ->
+                            if f.loc == targetField.loc then
+                                { f | figure = playerField.figure }
+                            else if f.loc == playerField.loc then
+                                { f | figure = Nothing, isSelected = False }
+                            else
+                                f
+                        )
+                        model.board
+    in
+        { model
+            | selected = None
+            , board = updatedBoard
+        }
+
+
+clickField : Model -> Field -> Model
+clickField model clickedField =
+    let
+        legitSelection =
+            if model.selected == None then
+                True
+            else
+                case model.selected of
+                    None ->
+                        False
+
+                    Active field ->
+                        case clickedField.figure of
+                            Nothing ->
+                                False
+
+                            Just figureTarget ->
+                                case field.figure of
+                                    Nothing ->
+                                        False
+
+                                    Just figurePlayer ->
+                                        figureTarget.color == figurePlayer.color
+    in
+        if legitSelection then
+            selectField model clickedField
+        else
+            moveFigure model clickedField
+
+
 type Msg
     = Restart
+    | ClickField Field
     | SelectField Field
 
 
@@ -189,6 +254,9 @@ update msg model =
 
         SelectField field ->
             selectField model field
+
+        ClickField field ->
+            clickField model field
 
 
 drawFigure : Field -> String
@@ -246,7 +314,7 @@ drawField field =
                 field.color
             )
           )
-        , onClick (SelectField field)
+        , onClick (ClickField field)
         ]
         [ div [] [ text (drawFigure field) ] ]
 
