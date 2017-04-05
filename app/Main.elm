@@ -18,19 +18,13 @@ type alias Field =
     { loc : Location
     , color : Color
     , figure : Figure
+    , isSelected : Bool
     }
 
 
 type Selection
     = None
     | Active Field
-
-
-type alias Model =
-    { restart : Bool
-    , board : Matrix Field
-    , selected : Selection
-    }
 
 
 fieldToText : Field -> String
@@ -46,14 +40,34 @@ getFigureColor loc =
         Style.whiteColor
 
 
+type alias Model =
+    { restart : Bool
+    , board : Matrix Field
+    , selected : Selection
+    }
+
+
 model : Model
 model =
     { restart = False
     , board =
         square 8 <|
-            (\l -> { color = (getFigureColor l), loc = l, figure = { class = "_" } })
+            (\l -> { color = (getFigureColor l), loc = l, figure = { class = "_" }, isSelected = False })
     , selected = None
     }
+
+
+selectField : Matrix Field -> Field -> Matrix Field
+selectField board field =
+    (Matrix.map
+        (\f ->
+            if (f.loc == field.loc) then
+                { f | isSelected = True }
+            else
+                { f | isSelected = False }
+        )
+        board
+    )
 
 
 type Msg
@@ -68,13 +82,22 @@ update msg model =
             { model | restart = True }
 
         SelectField field ->
-            { model | selected = (Active field) }
+            { model
+                | selected = (Active field)
+                , board = (selectField model.board field)
+            }
 
 
 drawField : Field -> Html Msg
 drawField field =
     Html.div
-        [ (Style.fieldStyles field.color)
+        [ (Style.fieldStyles
+            (if field.isSelected then
+                Style.selectionColor
+             else
+                field.color
+            )
+          )
         , onClick (SelectField field)
         ]
         [ text (fieldToText field) ]

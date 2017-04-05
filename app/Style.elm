@@ -14,6 +14,10 @@ blackColor =
     Color.black
 
 
+selectionColor =
+    Color.yellow
+
+
 fieldStyles : Color -> Html.Attribute msg
 fieldStyles color =
     Html.Attributes.style
