@@ -9,15 +9,30 @@ import Color exposing (Color)
 import Helper exposing (..)
 
 
+type ChessFigure
+    = Pawn
+    | Knight
+    | Bishop
+    | Rook
+    | Queen
+    | King
+
+
+type Player
+    = Black
+    | White
+
+
 type alias Figure =
-    { class : String
+    { figure : ChessFigure
+    , color : Player
     }
 
 
 type alias Field =
     { loc : Location
     , color : Color
-    , figure : Figure
+    , figure : Maybe Figure
     , isSelected : Bool
     }
 
@@ -32,10 +47,10 @@ fieldToText field =
     toString (row field.loc) ++ " / " ++ toString (Matrix.col field.loc)
 
 
-getFigureColor : Location -> Color
-getFigureColor loc =
+getFieldColor : Location -> Color
+getFieldColor loc =
     if (((row loc) % 2) == ((Matrix.col loc) % 2)) then
-        Style.blackColor
+        Style.greyColor
     else
         Style.whiteColor
 
@@ -47,12 +62,59 @@ type alias Model =
     }
 
 
+getDefaultFigure : Location -> Maybe Figure
+getDefaultFigure loc =
+    let
+        row =
+            Matrix.row loc
+
+        col =
+            Matrix.col loc
+    in
+        if row == 1 then
+            Just { figure = Pawn, color = Black }
+        else if row == 6 then
+            Just { figure = Pawn, color = White }
+        else if row == 0 && (col == 0 || col == 7) then
+            Just { figure = Rook, color = Black }
+        else if row == 7 && (col == 0 || col == 7) then
+            Just { figure = Rook, color = White }
+        else if row == 0 && (col == 1 || col == 6) then
+            Just { figure = Knight, color = Black }
+        else if row == 7 && (col == 1 || col == 6) then
+            Just { figure = Knight, color = White }
+        else if row == 0 && (col == 2 || col == 5) then
+            Just { figure = Bishop, color = Black }
+        else if row == 7 && (col == 2 || col == 5) then
+            Just { figure = Bishop, color = White }
+        else if row == 0 && col == 3 then
+            Just { figure = Queen, color = Black }
+        else if row == 7 && col == 4 then
+            Just { figure = Queen, color = White }
+        else if row == 0 && col == 4 then
+            Just { figure = King, color = Black }
+        else if row == 7 && col == 3 then
+            Just { figure = King, color = White }
+        else
+            Nothing
+
+
+startBoard : Matrix Field
+startBoard =
+    square 8 <|
+        (\l ->
+            { color = (getFieldColor l)
+            , loc = l
+            , figure = (getDefaultFigure l)
+            , isSelected = False
+            }
+        )
+
+
 model : Model
 model =
     { restart = False
-    , board =
-        square 8 <|
-            (\l -> { color = (getFigureColor l), loc = l, figure = { class = "_" }, isSelected = False })
+    , board = startBoard
     , selected = None
     }
 
@@ -88,9 +150,54 @@ update msg model =
             }
 
 
+drawFigure : Field -> String
+drawFigure field =
+    case field.figure of
+        Nothing ->
+            "_"
+
+        Just figure ->
+            case figure.figure of
+                Pawn ->
+                    if figure.color == Black then
+                        "♟"
+                    else
+                        "♙"
+
+                Knight ->
+                    if figure.color == Black then
+                        "♞"
+                    else
+                        "♘"
+
+                Rook ->
+                    if figure.color == Black then
+                        "♜"
+                    else
+                        "♖"
+
+                Bishop ->
+                    if figure.color == Black then
+                        "♝"
+                    else
+                        "♗"
+
+                Queen ->
+                    if figure.color == Black then
+                        "♛"
+                    else
+                        "♕"
+
+                King ->
+                    if figure.color == Black then
+                        "♚"
+                    else
+                        "♔"
+
+
 drawField : Field -> Html Msg
 drawField field =
-    Html.div
+    div
         [ (Style.fieldStyles
             (if field.isSelected then
                 Style.selectionColor
@@ -100,7 +207,7 @@ drawField field =
           )
         , onClick (SelectField field)
         ]
-        [ text (fieldToText field) ]
+        [ div [] [ text (drawFigure field) ] ]
 
 
 drawBoard : Matrix Field -> Html Msg

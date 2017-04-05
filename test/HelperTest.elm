@@ -26,6 +26,6 @@ colorToCssStringTest =
                     |> Expect.equal "rgb(255, 255, 255)"
         , test "expected result for red" <|
             \() ->
-              colorToCssString Color.red
-                |> Expect.equal "rgb(204, 0, 0)"
+                colorToCssString Color.red
+                    |> Expect.equal "rgb(204, 0, 0)"
         ]

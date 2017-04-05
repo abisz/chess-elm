@@ -14,8 +14,19 @@ blackColor =
     Color.black
 
 
+greyColor =
+    Color.grey
+
+
 selectionColor =
     Color.yellow
+
+
+figureStyles : Color -> Html.Attribute msg
+figureStyles color =
+    Html.Attributes.style
+        [ ( "color", (colorToCssString color) )
+        ]
 
 
 fieldStyles : Color -> Html.Attribute msg
@@ -27,15 +38,4 @@ fieldStyles color =
         , ( "cursor", "pointer" )
         , ( "text-align", "center" )
         , ( "background-color", (colorToCssString color) )
-        , ( "color"
-          , (let
-                textColor =
-                    if (color == whiteColor) then
-                        blackColor
-                    else
-                        whiteColor
-             in
-                colorToCssString textColor
-            )
-          )
         ]
