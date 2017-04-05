@@ -119,17 +119,61 @@ model =
     }
 
 
-selectField : Matrix Field -> Field -> Matrix Field
-selectField board field =
-    (Matrix.map
+fieldAlreadySelected : Selection -> Field -> Bool
+fieldAlreadySelected selected field =
+    case selected of
+        None ->
+            False
+
+        Active f ->
+            if f.loc == field.loc then
+                True
+            else
+                False
+
+
+updateBoardSelection : Matrix Field -> Field -> Matrix Field
+updateBoardSelection board field =
+    Matrix.map
         (\f ->
-            if (f.loc == field.loc) then
+            if ((f.loc == field.loc) && f.figure /= Nothing) then
                 { f | isSelected = True }
             else
                 { f | isSelected = False }
         )
         board
-    )
+
+
+selectField : Model -> Field -> Model
+selectField model clickedField =
+    let
+        noFigure =
+            if clickedField.figure == Nothing then
+                True
+            else
+                False
+
+        alreadySelected =
+            fieldAlreadySelected model.selected clickedField
+
+        board =
+            if alreadySelected then
+                Matrix.map (\f -> { f | isSelected = False }) model.board
+            else
+                updateBoardSelection model.board clickedField
+    in
+        if noFigure then
+            model
+        else if alreadySelected then
+            { model
+                | selected = None
+                , board = board
+            }
+        else
+            { model
+                | selected = (Active clickedField)
+                , board = board
+            }
 
 
 type Msg
@@ -144,10 +188,7 @@ update msg model =
             { model | restart = True }
 
         SelectField field ->
-            { model
-                | selected = (Active field)
-                , board = (selectField model.board field)
-            }
+            selectField model field
 
 
 drawFigure : Field -> String
