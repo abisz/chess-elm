@@ -4,9 +4,9 @@ import Types exposing (..)
 import Matrix exposing (..)
 
 
-isMoveLegit : Model -> Field -> Bool
-isMoveLegit model targetField =
-    case model.selected of
+isMoveLegit : Matrix Field -> Selection -> Field -> Bool
+isMoveLegit board selected targetField =
+    case selected of
         None ->
             False
 
@@ -18,26 +18,41 @@ isMoveLegit model targetField =
                 Just selectedFigure ->
                     case selectedFigure.figure of
                         Pawn ->
-                            isPawnMove selectedField targetField selectedFigure.color
+                            isPawnMove board selectedField targetField selectedFigure.color
 
                         Knight ->
                             isKnightMove selectedField targetField
 
                         Bishop ->
-                            isBishopMove model.board selectedField targetField
+                            isBishopMove board selectedField targetField
 
                         Rook ->
-                            isRookMove model.board selectedField targetField
+                            isRookMove board selectedField targetField
 
                         King ->
                             isKingMove selectedField targetField
 
                         Queen ->
-                            isQueenMove model.board selectedField targetField
+                            isQueenMove board selectedField targetField
 
 
-isPawnMove : Field -> Field -> Player -> Bool
-isPawnMove selectedField targetField player =
+hasFigure : Maybe Field -> Bool
+hasFigure maybeField =
+    case maybeField of
+        Nothing ->
+            False
+
+        Just field ->
+            case field.figure of
+                Nothing ->
+                    False
+
+                _ ->
+                    True
+
+
+isPawnMove : Matrix Field -> Field -> Field -> Player -> Bool
+isPawnMove board selectedField targetField player =
     -- Todo: double jump can't jump over figure
     let
         xDiff =
@@ -49,7 +64,20 @@ isPawnMove selectedField targetField player =
         if
             (player
                 == Black
-                && (yDiff == 1 || ((Matrix.row selectedField.loc) == 1 && yDiff == 2))
+                && (yDiff
+                        == 1
+                        || (((Matrix.row selectedField.loc) == 1 && yDiff == 2)
+                                && not
+                                    (hasFigure <|
+                                        get
+                                            (loc
+                                                ((row selectedField.loc) + 1)
+                                                (Matrix.col selectedField.loc)
+                                            )
+                                            board
+                                    )
+                           )
+                   )
                 && (xDiff == 0 || (hasEnemyFigure targetField player && (abs xDiff) <= 1))
             )
         then
@@ -57,7 +85,19 @@ isPawnMove selectedField targetField player =
         else if
             (player
                 == White
-                && (yDiff == -1 || ((Matrix.row selectedField.loc) == 6 && yDiff == -2))
+                && (yDiff
+                        == -1
+                        || (((Matrix.row selectedField.loc) == 6 && yDiff == -2))
+                        && not
+                            (hasFigure <|
+                                get
+                                    (loc
+                                        ((row selectedField.loc) - 1)
+                                        (Matrix.col selectedField.loc)
+                                    )
+                                    board
+                            )
+                   )
                 && (xDiff == 0 || (hasEnemyFigure targetField player && (abs xDiff) <= 1))
             )
         then

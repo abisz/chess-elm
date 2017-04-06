@@ -159,7 +159,7 @@ makeMove model targetField =
                     True
 
         legitMove =
-            isMoveLegit model targetField
+            isMoveLegit model.board model.selected targetField
 
         updatedBoard =
             case model.selected of
