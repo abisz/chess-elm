@@ -206,6 +206,50 @@ isKnightMove selectedField targetField =
             False
 
 
+nothingBetweenFieldsDiagonal : Matrix Field -> Field -> Field -> Bool
+nothingBetweenFieldsDiagonal board selectedField targetField =
+    let
+        xDiff =
+            (Matrix.col targetField.loc) - (Matrix.col selectedField.loc)
+
+        yDiff =
+            (row targetField.loc) - (row selectedField.loc)
+    in
+        Matrix.flatten board
+            |> List.foldl
+                (\f empty ->
+                    let
+                        xDiffBetween =
+                            (Matrix.col f.loc) - (Matrix.col selectedField.loc)
+
+                        yDiffBetween =
+                            (row f.loc) - (row selectedField.loc)
+                    in
+                        if empty == False then
+                            False
+                        else if
+                            -- Is Bishop Move
+                            ((abs xDiffBetween)
+                                == (abs yDiffBetween)
+                                -- Is the Same Move
+                                && (((xDiffBetween > 0) == (xDiff > 0)) && xDiffBetween /= 0)
+                                && (((yDiffBetween > 0) == (yDiff > 0)) && yDiffBetween /= 0)
+                                -- Is Max to Move
+                                && ((abs xDiff) > (abs xDiffBetween))
+                            )
+                        then
+                            case f.figure of
+                                Nothing ->
+                                    True
+
+                                Just figure ->
+                                    False
+                        else
+                            True
+                )
+                True
+
+
 isBishopMove : Matrix Field -> Field -> Field -> Bool
 isBishopMove board selectedField targetField =
     let
@@ -216,41 +260,73 @@ isBishopMove board selectedField targetField =
             (row targetField.loc) - (row selectedField.loc)
     in
         if (abs xDiff) == (abs yDiff) then
-            Matrix.flatten board
-                |> List.foldl
-                    (\f empty ->
-                        let
-                            xDiffBetween =
-                                (Matrix.col f.loc) - (Matrix.col selectedField.loc)
-
-                            yDiffBetween =
-                                (row f.loc) - (row selectedField.loc)
-                        in
-                            if empty == False then
-                                False
-                            else if
-                                -- Is Bishop Move
-                                ((abs xDiffBetween)
-                                    == (abs yDiffBetween)
-                                    -- Is the Same Move
-                                    && (((xDiffBetween > 0) == (xDiff > 0)) && xDiffBetween /= 0)
-                                    && (((yDiffBetween > 0) == (yDiff > 0)) && yDiffBetween /= 0)
-                                    -- Is Max to Move
-                                    && ((abs xDiff) > (abs xDiffBetween))
-                                )
-                            then
-                                case f.figure of
-                                    Nothing ->
-                                        True
-
-                                    Just figure ->
-                                        False
-                            else
-                                True
-                    )
-                    True
+            nothingBetweenFieldsDiagonal board selectedField targetField
         else
             False
+
+
+nothingBetweenFieldsCross : Matrix Field -> Field -> Field -> Bool
+nothingBetweenFieldsCross board selectedField targetField =
+    let
+        xDiff =
+            (Matrix.col targetField.loc) - (Matrix.col selectedField.loc)
+
+        yDiff =
+            (row targetField.loc) - (row selectedField.loc)
+    in
+        Matrix.flatten board
+            |> List.foldl
+                (\f empty ->
+                    let
+                        xDiffBetween =
+                            (Matrix.col f.loc) - (Matrix.col selectedField.loc)
+
+                        yDiffBetween =
+                            (row f.loc) - (row selectedField.loc)
+                    in
+                        if empty == False then
+                            False
+                        else if
+                            -- Is Rook Move
+                            ((xDiffBetween == 0 || yDiffBetween == 0)
+                                -- Is the Same Rook Move
+                                && ((((xDiffBetween
+                                        > 0
+                                      )
+                                        == (xDiff > 0)
+                                     )
+                                        && xDiffBetween
+                                        /= 0
+                                        && xDiff
+                                        /= 0
+                                    )
+                                        || (((yDiffBetween > 0)
+                                                == (yDiff > 0)
+                                            )
+                                                && yDiffBetween
+                                                /= 0
+                                                && yDiff
+                                                /= 0
+                                           )
+                                   )
+                                -- Is Max to Move
+                                && ((abs xDiff)
+                                        > (abs xDiffBetween)
+                                        || (abs yDiff)
+                                        > (abs yDiffBetween)
+                                   )
+                            )
+                        then
+                            case f.figure of
+                                Nothing ->
+                                    True
+
+                                Just figure ->
+                                    False
+                        else
+                            True
+                )
+                True
 
 
 isRookMove : Matrix Field -> Field -> Field -> Bool
@@ -263,61 +339,30 @@ isRookMove board selectedField targetField =
             (row targetField.loc) - (row selectedField.loc)
     in
         if (xDiff == 0 || yDiff == 0) then
-            Matrix.flatten board
-                |> List.foldl
-                    (\f empty ->
-                        let
-                            xDiffBetween =
-                                (Matrix.col f.loc) - (Matrix.col selectedField.loc)
-
-                            yDiffBetween =
-                                (row f.loc) - (row selectedField.loc)
-                        in
-                            if empty == False then
-                                False
-                            else if
-                                -- Is Rook Move
-                                ((xDiffBetween == 0 || yDiffBetween == 0)
-                                    -- Is the Same Rook Move
-                                    && ((((xDiffBetween
-                                            > 0
-                                          )
-                                            == (xDiff > 0)
-                                         )
-                                            && xDiffBetween
-                                            /= 0
-                                            && xDiff
-                                            /= 0
-                                        )
-                                            || (((yDiffBetween > 0)
-                                                    == (yDiff > 0)
-                                                )
-                                                    && yDiffBetween
-                                                    /= 0
-                                                    && yDiff
-                                                    /= 0
-                                               )
-                                       )
-                                    -- Is Max to Move
-                                    && ((abs xDiff)
-                                            > (abs xDiffBetween)
-                                            || (abs yDiff)
-                                            > (abs yDiffBetween)
-                                       )
-                                )
-                            then
-                                case f.figure of
-                                    Nothing ->
-                                        True
-
-                                    Just figure ->
-                                        False
-                            else
-                                True
-                    )
-                    True
+            nothingBetweenFieldsCross board selectedField targetField
         else
             False
+
+
+isKingMove : Field -> Field -> Bool
+isKingMove selectedField targetField =
+    let
+        xDiff =
+            (Matrix.col targetField.loc) - (Matrix.col selectedField.loc)
+
+        yDiff =
+            (row targetField.loc) - (row selectedField.loc)
+    in
+        if (abs xDiff) <= 1 && (abs yDiff) <= 1 && not (xDiff == 0 && yDiff == 0) then
+            True
+        else
+            False
+
+
+isQueenMove : Matrix Field -> Field -> Field -> Bool
+isQueenMove board selectedField targetField =
+    isBishopMove board selectedField targetField
+        || isRookMove board selectedField targetField
 
 
 isMoveLegit : Model -> Field -> Bool
@@ -345,8 +390,11 @@ isMoveLegit model targetField =
                         Rook ->
                             isRookMove model.board selectedField targetField
 
-                        _ ->
-                            True
+                        King ->
+                            isKingMove selectedField targetField
+
+                        Queen ->
+                            isQueenMove model.board selectedField targetField
 
 
 makeMove : Model -> Field -> Model
