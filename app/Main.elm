@@ -146,8 +146,52 @@ changeTurnPlayer player =
         Black
 
 
-moveFigure : Model -> Field -> Model
-moveFigure model targetField =
+isPawnMove : Field -> Field -> Player -> Bool
+isPawnMove selectedField targetField player =
+    if
+        (player
+            == Black
+            && (row targetField.loc)
+            - (row selectedField.loc)
+            == 1
+        )
+    then
+        True
+    else if
+        (player
+            == White
+            && (row selectedField.loc)
+            - (row targetField.loc)
+            == 1
+        )
+    then
+        True
+    else
+        False
+
+
+isMoveLegit : Model -> Field -> Bool
+isMoveLegit model targetField =
+    case model.selected of
+        None ->
+            False
+
+        Active selectedField ->
+            case selectedField.figure of
+                Nothing ->
+                    False
+
+                Just selectedFigure ->
+                    case selectedFigure.figure of
+                        Pawn ->
+                            isPawnMove selectedField targetField selectedFigure.color
+
+                        _ ->
+                            True
+
+
+makeMove : Model -> Field -> Model
+makeMove model targetField =
     let
         isSelected =
             case model.selected of
@@ -156,6 +200,9 @@ moveFigure model targetField =
 
                 Active activeField ->
                     True
+
+        legitMove =
+            isMoveLegit model targetField
 
         updatedBoard =
             case model.selected of
@@ -182,16 +229,19 @@ moveFigure model targetField =
                 Active field ->
                     True
     in
-        { model
-            | selected = None
-            , board = updatedBoard
-            , turn =
-                (if changeTurn then
-                    changeTurnPlayer model.turn
-                 else
-                    model.turn
-                )
-        }
+        if legitMove then
+            { model
+                | selected = None
+                , board = updatedBoard
+                , turn =
+                    (if changeTurn then
+                        changeTurnPlayer model.turn
+                     else
+                        model.turn
+                    )
+            }
+        else
+            model
 
 
 clickField : Model -> Field -> Model
@@ -199,6 +249,7 @@ clickField model clickedField =
     let
         legitSelection =
             case model.selected of
+                -- pick up
                 None ->
                     case clickedField.figure of
                         Nothing ->
@@ -210,6 +261,7 @@ clickField model clickedField =
                             else
                                 False
 
+                -- put down
                 Active field ->
                     case clickedField.figure of
                         Nothing ->
@@ -226,7 +278,7 @@ clickField model clickedField =
         if legitSelection then
             selectField model clickedField
         else
-            moveFigure model clickedField
+            makeMove model clickedField
 
 
 update : Msg -> Model -> Model
