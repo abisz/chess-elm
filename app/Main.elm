@@ -188,6 +188,67 @@ isPawnMove selectedField targetField player =
             False
 
 
+isKnightMove : Field -> Field -> Bool
+isKnightMove selectedField targetField =
+    let
+        xDiff =
+            (Matrix.col targetField.loc) - (Matrix.col selectedField.loc)
+
+        yDiff =
+            (row targetField.loc) - (row selectedField.loc)
+    in
+        if (abs xDiff) == 2 && (abs yDiff) == 1 then
+            True
+        else if (abs xDiff) == 1 && (abs yDiff) == 2 then
+            True
+        else
+            False
+
+
+isBishopMove : Matrix Field -> Field -> Field -> Bool
+isBishopMove board selectedField targetField =
+    let
+        xDiff =
+            (Matrix.col targetField.loc) - (Matrix.col selectedField.loc)
+
+        yDiff =
+            (row targetField.loc) - (row selectedField.loc)
+    in
+        if (abs xDiff) == (abs yDiff) then
+            Matrix.flatten board
+                |> List.foldl
+                    (\f empty ->
+                        let
+                            xDiffBetween =
+                                (Matrix.col f.loc) - (Matrix.col selectedField.loc)
+
+                            yDiffBetween =
+                                (row f.loc) - (row selectedField.loc)
+                        in
+                            if empty == False then
+                                False
+                            else if
+                                ((abs xDiffBetween)
+                                    == (abs yDiffBetween)
+                                    && ((xDiffBetween > 0) == (xDiff > 0))
+                                    && ((yDiffBetween > 0) == (yDiff > 0))
+                                    && ((abs xDiff) > (abs xDiffBetween))
+                                )
+                            then
+                                case f.figure of
+                                    Nothing ->
+                                        True
+
+                                    Just figure ->
+                                        False
+                            else
+                                True
+                    )
+                    True
+        else
+            False
+
+
 isMoveLegit : Model -> Field -> Bool
 isMoveLegit model targetField =
     case model.selected of
@@ -203,6 +264,12 @@ isMoveLegit model targetField =
                     case selectedFigure.figure of
                         Pawn ->
                             isPawnMove selectedField targetField selectedFigure.color
+
+                        Knight ->
+                            isKnightMove selectedField targetField
+
+                        Bishop ->
+                            isBishopMove model.board selectedField targetField
 
                         _ ->
                             True
