@@ -10,6 +10,7 @@ import Helper exposing (..)
 import BoardView exposing (drawBoard)
 import Types exposing (..)
 import Move exposing (isMoveLegit)
+import Converter exposing (boardString)
 
 
 fieldToText : Field -> String
@@ -272,6 +273,7 @@ view model =
                        )
                 )
             , board
+            , text (boardString model.board)
             ]
 
 

@@ -53,7 +53,6 @@ hasFigure maybeField =
 
 isPawnMove : Matrix Field -> Field -> Field -> Player -> Bool
 isPawnMove board selectedField targetField player =
-    -- Todo: double jump can't jump over figure
     let
         xDiff =
             (Matrix.col targetField.loc) - (Matrix.col selectedField.loc)
