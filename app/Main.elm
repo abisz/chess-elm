@@ -146,28 +146,46 @@ changeTurnPlayer player =
         Black
 
 
+hasEnemyFigure : Field -> Player -> Bool
+hasEnemyFigure field player =
+    case field.figure of
+        Nothing ->
+            False
+
+        Just figure ->
+            if figure.color == player then
+                False
+            else
+                True
+
+
 isPawnMove : Field -> Field -> Player -> Bool
 isPawnMove selectedField targetField player =
-    if
-        (player
-            == Black
-            && (row targetField.loc)
-            - (row selectedField.loc)
-            == 1
-        )
-    then
-        True
-    else if
-        (player
-            == White
-            && (row selectedField.loc)
-            - (row targetField.loc)
-            == 1
-        )
-    then
-        True
-    else
-        False
+    let
+        xDiff =
+            (Matrix.col targetField.loc) - (Matrix.col selectedField.loc)
+
+        yDiff =
+            (row targetField.loc) - (row selectedField.loc)
+    in
+        if
+            (player
+                == Black
+                && (yDiff == 1 || ((Matrix.row selectedField.loc) == 1 && yDiff == 2))
+                && (xDiff == 0 || (hasEnemyFigure targetField player && (abs xDiff) <= 1))
+            )
+        then
+            True
+        else if
+            (player
+                == White
+                && (yDiff == -1 || ((Matrix.row selectedField.loc) == 6 && yDiff == -2))
+                && (xDiff == 0 || (hasEnemyFigure targetField player && (abs xDiff) <= 1))
+            )
+        then
+            True
+        else
+            False
 
 
 isMoveLegit : Model -> Field -> Bool
