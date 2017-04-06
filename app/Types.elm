@@ -38,13 +38,11 @@ type Selection
 
 
 type alias Model =
-    { restart : Bool
-    , board : Matrix Field
+    { board : Matrix Field
     , selected : Selection
+    , turn : Player
     }
 
 
 type Msg
-    = Restart
-    | ClickField Field
-    | SelectField Field
+    = ClickField Field

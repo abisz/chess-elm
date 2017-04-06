@@ -75,9 +75,9 @@ startBoard =
 
 model : Model
 model =
-    { restart = False
-    , board = startBoard
+    { board = startBoard
     , selected = None
+    , turn = Black
     }
 
 
@@ -138,6 +138,14 @@ selectField model clickedField =
             }
 
 
+changeTurnPlayer : Player -> Player
+changeTurnPlayer player =
+    if player == Black then
+        White
+    else
+        Black
+
+
 moveFigure : Model -> Field -> Model
 moveFigure model targetField =
     let
@@ -165,10 +173,24 @@ moveFigure model targetField =
                                 f
                         )
                         model.board
+
+        changeTurn =
+            case model.selected of
+                None ->
+                    False
+
+                Active field ->
+                    True
     in
         { model
             | selected = None
             , board = updatedBoard
+            , turn =
+                (if changeTurn then
+                    changeTurnPlayer model.turn
+                 else
+                    model.turn
+                )
         }
 
 
@@ -176,25 +198,30 @@ clickField : Model -> Field -> Model
 clickField model clickedField =
     let
         legitSelection =
-            if model.selected == None then
-                True
-            else
-                case model.selected of
-                    None ->
-                        False
+            case model.selected of
+                None ->
+                    case clickedField.figure of
+                        Nothing ->
+                            False
 
-                    Active field ->
-                        case clickedField.figure of
-                            Nothing ->
+                        Just figure ->
+                            if figure.color == model.turn then
+                                True
+                            else
                                 False
 
-                            Just figureTarget ->
-                                case field.figure of
-                                    Nothing ->
-                                        False
+                Active field ->
+                    case clickedField.figure of
+                        Nothing ->
+                            False
 
-                                    Just figurePlayer ->
-                                        figureTarget.color == figurePlayer.color
+                        Just figure ->
+                            case field.figure of
+                                Nothing ->
+                                    False
+
+                                Just figurePlayer ->
+                                    figure.color == figurePlayer.color
     in
         if legitSelection then
             selectField model clickedField
@@ -205,12 +232,6 @@ clickField model clickedField =
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        Restart ->
-            { model | restart = True }
-
-        SelectField field ->
-            selectField model field
-
         ClickField field ->
             clickField model field
 
@@ -232,8 +253,15 @@ view model =
     in
         div []
             [ h1 [ style [ ( "color", colorToCssString Style.blackColor ) ] ] [ text ("Elm Chess") ]
-            , button [ onClick Restart ] [ text "Restart" ]
             , text ("Selected: " ++ selection)
+            , text
+                ("Turn: "
+                    ++ (if model.turn == Black then
+                            "Black"
+                        else
+                            "White"
+                       )
+                )
             , board
             ]
 
