@@ -161,6 +161,7 @@ hasEnemyFigure field player =
 
 isPawnMove : Field -> Field -> Player -> Bool
 isPawnMove selectedField targetField player =
+    -- Todo: double jump can't jump over figure
     let
         xDiff =
             (Matrix.col targetField.loc) - (Matrix.col selectedField.loc)
@@ -228,11 +229,81 @@ isBishopMove board selectedField targetField =
                             if empty == False then
                                 False
                             else if
+                                -- Is Bishop Move
                                 ((abs xDiffBetween)
                                     == (abs yDiffBetween)
-                                    && ((xDiffBetween > 0) == (xDiff > 0))
-                                    && ((yDiffBetween > 0) == (yDiff > 0))
+                                    -- Is the Same Move
+                                    && (((xDiffBetween > 0) == (xDiff > 0)) && xDiffBetween /= 0)
+                                    && (((yDiffBetween > 0) == (yDiff > 0)) && yDiffBetween /= 0)
+                                    -- Is Max to Move
                                     && ((abs xDiff) > (abs xDiffBetween))
+                                )
+                            then
+                                case f.figure of
+                                    Nothing ->
+                                        True
+
+                                    Just figure ->
+                                        False
+                            else
+                                True
+                    )
+                    True
+        else
+            False
+
+
+isRookMove : Matrix Field -> Field -> Field -> Bool
+isRookMove board selectedField targetField =
+    let
+        xDiff =
+            (Matrix.col targetField.loc) - (Matrix.col selectedField.loc)
+
+        yDiff =
+            (row targetField.loc) - (row selectedField.loc)
+    in
+        if (xDiff == 0 || yDiff == 0) then
+            Matrix.flatten board
+                |> List.foldl
+                    (\f empty ->
+                        let
+                            xDiffBetween =
+                                (Matrix.col f.loc) - (Matrix.col selectedField.loc)
+
+                            yDiffBetween =
+                                (row f.loc) - (row selectedField.loc)
+                        in
+                            if empty == False then
+                                False
+                            else if
+                                -- Is Rook Move
+                                ((xDiffBetween == 0 || yDiffBetween == 0)
+                                    -- Is the Same Rook Move
+                                    && ((((xDiffBetween
+                                            > 0
+                                          )
+                                            == (xDiff > 0)
+                                         )
+                                            && xDiffBetween
+                                            /= 0
+                                            && xDiff
+                                            /= 0
+                                        )
+                                            || (((yDiffBetween > 0)
+                                                    == (yDiff > 0)
+                                                )
+                                                    && yDiffBetween
+                                                    /= 0
+                                                    && yDiff
+                                                    /= 0
+                                               )
+                                       )
+                                    -- Is Max to Move
+                                    && ((abs xDiff)
+                                            > (abs xDiffBetween)
+                                            || (abs yDiff)
+                                            > (abs yDiffBetween)
+                                       )
                                 )
                             then
                                 case f.figure of
@@ -270,6 +341,9 @@ isMoveLegit model targetField =
 
                         Bishop ->
                             isBishopMove model.board selectedField targetField
+
+                        Rook ->
+                            isRookMove model.board selectedField targetField
 
                         _ ->
                             True
