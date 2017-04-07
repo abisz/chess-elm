@@ -5,6 +5,7 @@ import Html exposing (..)
 import Html.Events exposing (..)
 import Style exposing (..)
 import Matrix exposing (..)
+import Move exposing (isMoveLegit)
 
 
 drawFigure : Field -> String
@@ -73,6 +74,8 @@ drawBoard board selection =
                 [ (Style.fieldStyles
                     (if fieldIsSelected field selection then
                         Style.selectionColor
+                     else if isMoveLegit board selection field then
+                        Style.targetColor
                      else
                         field.color
                     )

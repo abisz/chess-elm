@@ -22,6 +22,10 @@ selectionColor =
     Color.yellow
 
 
+targetColor =
+    Color.purple
+
+
 figureStyles : Color -> Html.Attribute msg
 figureStyles color =
     Html.Attributes.style
