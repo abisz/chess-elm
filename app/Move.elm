@@ -90,7 +90,7 @@ isPawnMove board selectedField targetField player =
                                     )
                            )
                    )
-                && (xDiff == 0 || (hasEnemyFigure targetField player && (abs xDiff) <= 1))
+                && (xDiff == 0 || (hasEnemyFigure targetField player && (abs yDiff) <= 1))
             )
         then
             True
@@ -110,7 +110,7 @@ isPawnMove board selectedField targetField player =
                                     board
                             )
                    )
-                && (xDiff == 0 || (hasEnemyFigure targetField player && (abs xDiff) <= 1))
+                && (xDiff == 0 || (hasEnemyFigure targetField player && (abs yDiff) <= 1))
             )
         then
             True

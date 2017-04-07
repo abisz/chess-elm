@@ -23,31 +23,39 @@ allTests =
 
 pawnMoveTest : Test
 pawnMoveTest =
-    describe "Pawn Move"
-        [ test "Default Move" <|
-            \() ->
-                Expect.equal True <|
-                    testMove "wp4a;" (loc 4 0) (loc 3 0) Pawn White
-        , test "Can't move backwards" <|
-            \() ->
-                Expect.equal False <|
-                    testMove "wp4a;" (loc 4 0) (loc 5 0) Pawn White
-        , test "Can't move diagonal" <|
-            \() ->
-                Expect.equal False <|
-                    testMove "wp4a;" (loc 4 0) (loc 3 1) Pawn White
-        , test "Double First Move" <|
-            \() ->
-                Expect.equal True <|
-                    testMove "wp2a;" (loc 6 0) (loc 4 0) Pawn White
-        , test "Double Move not possible" <|
-            \() ->
-                Expect.equal False <|
-                    testMove "wp3a;" (loc 5 0) (loc 2 0) Pawn White
-        , test "Double Move can't skip figure" <|
-            \() ->
-                Expect.equal False <|
-                    testMove "wp2a;wp3a;" (loc 6 0) (loc 4 0) Pawn White
+    describe "Pawn Moves"
+        [ describe "Basic Moves"
+            [ test "Default Move" <|
+                \() ->
+                    Expect.equal True <|
+                        testMove "wp4a;" (loc 4 0) (loc 3 0) Pawn White
+            , test "Can't move backwards" <|
+                \() ->
+                    Expect.equal False <|
+                        testMove "wp4a;" (loc 4 0) (loc 5 0) Pawn White
+            , test "Can't move diagonal" <|
+                \() ->
+                    Expect.equal False <|
+                        testMove "wp4a;" (loc 4 0) (loc 3 1) Pawn White
+            ]
+        , describe "Double Move"
+            [ test "Possible for First Move" <|
+                \() ->
+                    Expect.equal True <|
+                        testMove "wp2a;" (loc 6 0) (loc 4 0) Pawn White
+            , test "Not possible by Default" <|
+                \() ->
+                    Expect.equal False <|
+                        testMove "wp3a;" (loc 5 0) (loc 2 0) Pawn White
+            , test "Double Move can't skip figure" <|
+                \() ->
+                    Expect.equal False <|
+                        testMove "wp2a;wp3a;" (loc 6 0) (loc 4 0) Pawn White
+            , test "Can't combine Double Move with Beating" <|
+                \() ->
+                    Expect.equal False <|
+                        testMove "bp7c;wp5b;" (loc 1 2) (loc 3 1) Pawn Black
+            ]
         , test "Can't beat same color" <|
             \() ->
                 Expect.equal False <|
