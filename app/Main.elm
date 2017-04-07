@@ -9,7 +9,7 @@ import Helper exposing (..)
 import BoardView exposing (drawBoard)
 import Types exposing (..)
 import Move exposing (isMoveLegit)
-import Converter exposing (boardString, stringToBoard)
+import Converter exposing (boardToString, stringToBoard)
 import BoardGenerator exposing (startBoard)
 
 
@@ -166,6 +166,9 @@ view model =
         board =
             drawBoard model.board model.selected
 
+        boardString =
+            boardToString model.board
+
         selection =
             (case model.selected of
                 None ->
@@ -188,13 +191,13 @@ view model =
                 )
             , board
             , textarea
-                [ onInput RenderBoard
-                , style
+                [ style
                     [ ( "width", "400px" )
                     , ( "height", "150px" )
                     ]
+                , value boardString
                 ]
-                [ text (boardString model.board) ]
+                []
             ]
 
 

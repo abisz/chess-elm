@@ -1,4 +1,4 @@
-module Converter exposing (boardString, stringToBoard)
+module Converter exposing (boardToString, stringToBoard)
 
 import Types exposing (..)
 import Matrix exposing (..)
@@ -121,8 +121,8 @@ fieldString field =
         fig ++ row ++ col
 
 
-boardString : Matrix Field -> String
-boardString board =
+boardToString : Matrix Field -> String
+boardToString board =
     Matrix.flatten board
         |> List.foldl
             (\f string ->
@@ -222,13 +222,16 @@ stringToFigure string =
         _ ->
             Pawn
 
+
 stringToPlayer : String -> Player
 stringToPlayer string =
     case string of
         "w" ->
             White
+
         "b" ->
             Black
+
         _ ->
             White
 
