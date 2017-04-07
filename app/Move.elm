@@ -41,6 +41,7 @@ isMoveLegit board selected targetField =
                     case targetField.figure of
                         Nothing ->
                             moveIsPossible board selectedField targetField selectedFigure
+
                         Just targetFigure ->
                             if targetFigure.color == selectedFigure.color then
                                 False
