@@ -13,12 +13,13 @@ allTests : Test
 allTests =
     describe "Move Test Suite"
         [ pawnMoveTest
+        , knightMoveTest
         ]
 
 
 pawnMoveTest : Test
 pawnMoveTest =
-    describe "Pawn Move Test"
+    describe "Pawn Move"
         [ test "Default Move" <|
             \() ->
                 Expect.equal True <| testMove "wp4a;" (loc 4 0) (loc 3 0) Pawn White
@@ -46,6 +47,33 @@ pawnMoveTest =
         , test "Can beat other color diagonal" <|
             \() ->
                 Expect.equal True <| testMove "wp2a;bp3b;" (loc 6 0) (loc 5 1) Pawn White
+        ]
+
+
+knightMoveTest : Test
+knightMoveTest =
+    describe "Knight Moves"
+        [ describe "Basic Moves"
+            [ test "Default Success" <|
+                \() ->
+                    Expect.equal True <| testMove "bk5d;" (loc 3 3) (loc 2 1) Knight Black
+            , test "Default Failure" <|
+                \() ->
+                    Expect.equal False <| testMove "bk5d;" (loc 3 3) (loc 3 4) Knight Black
+            ]
+        , test "Jump over Figure" <|
+            \() ->
+                Expect.equal True <| testMove "bk5d;wp6d;wp6e;wp7d;" (loc 3 3) (loc 1 4) Knight Black
+        , describe "Beat Figure"
+            [ test "Different Color" <|
+                \() ->
+                    Expect.equal True <|
+                        testMove "bk5d;wp4b;" (loc 3 3) (loc 4 1) Knight Black
+            , test "Same Color" <|
+                \() ->
+                    Expect.equal False <|
+                        testMove "bk5d;bp4f;" (loc 3 3) (loc 4 5) Knight Black
+            ]
         ]
 
 
