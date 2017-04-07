@@ -4,6 +4,28 @@ import Types exposing (..)
 import Matrix exposing (..)
 
 
+moveIsPossible : Matrix Field -> Field -> Field -> Figure -> Bool
+moveIsPossible board selectedField targetField figure =
+    case figure.figure of
+        Pawn ->
+            isPawnMove board selectedField targetField figure.color
+
+        Knight ->
+            isKnightMove selectedField targetField
+
+        Bishop ->
+            isBishopMove board selectedField targetField
+
+        Rook ->
+            isRookMove board selectedField targetField
+
+        King ->
+            isKingMove selectedField targetField
+
+        Queen ->
+            isQueenMove board selectedField targetField
+
+
 isMoveLegit : Matrix Field -> Selection -> Field -> Bool
 isMoveLegit board selected targetField =
     case selected of
@@ -16,24 +38,14 @@ isMoveLegit board selected targetField =
                     False
 
                 Just selectedFigure ->
-                    case selectedFigure.figure of
-                        Pawn ->
-                            isPawnMove board selectedField targetField selectedFigure.color
-
-                        Knight ->
-                            isKnightMove selectedField targetField
-
-                        Bishop ->
-                            isBishopMove board selectedField targetField
-
-                        Rook ->
-                            isRookMove board selectedField targetField
-
-                        King ->
-                            isKingMove selectedField targetField
-
-                        Queen ->
-                            isQueenMove board selectedField targetField
+                    case targetField.figure of
+                        Nothing ->
+                            moveIsPossible board selectedField targetField selectedFigure
+                        Just targetFigure ->
+                            if targetFigure.color == selectedFigure.color then
+                                False
+                            else
+                                moveIsPossible board selectedField targetField selectedFigure
 
 
 hasFigure : Maybe Field -> Bool
