@@ -17,6 +17,7 @@ allTests =
         , bishopMoveTest
         , rookMoveTest
         , queenMoveTest
+        , kingMoveTest
         ]
 
 
@@ -187,6 +188,32 @@ queenMoveTest =
                 \() ->
                     Expect.equal False <|
                         testMove "wq2g;wK5g;" (loc 6 6) (loc 3 6) Queen White
+            ]
+        ]
+
+
+kingMoveTest : Test
+kingMoveTest =
+    describe "King Moves"
+        [ describe "Basic Move"
+            [ test "Default Success" <|
+                \() ->
+                    Expect.equal True <|
+                        testMove "wK1a;" (loc 7 0) (loc 7 1) King White
+            , test "Default Failure" <|
+                \() ->
+                    Expect.equal False <|
+                        testMove "bK4f;" (loc 4 5) (loc 1 3) King Black
+            ]
+        , describe "Beat Figure"
+            [ test "Different Color" <|
+                \() ->
+                    Expect.equal True <|
+                        testMove "bK5b;wp4a;" (loc 3 1) (loc 4 0) King Black
+            , test "Same Color" <|
+                \() ->
+                    Expect.equal False <|
+                        testMove "bK7f;bk7e;" (loc 1 5) (loc 1 4) King Black
             ]
         ]
 
