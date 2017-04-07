@@ -1,13 +1,13 @@
-module Converter exposing (boardToString, stringToBoard)
+module Converter exposing (boardToString, stringToBoard, stringToField)
 
 import Types exposing (..)
 import Matrix exposing (..)
 import BoardGenerator exposing (getFieldColor)
 
 
-rowString : Int -> String
-rowString row =
-    case row of
+colString : Int -> String
+colString col =
+    case col of
         0 ->
             "a"
 
@@ -36,9 +36,9 @@ rowString row =
             "_"
 
 
-colString : Int -> String
-colString col =
-    case col of
+rowString : Int -> String
+rowString row =
+    case row of
         0 ->
             "8"
 
@@ -136,8 +136,8 @@ boardToString board =
             ""
 
 
-stringToRow : String -> Int
-stringToRow string =
+stringToCol : String -> Int
+stringToCol string =
     case string of
         "a" ->
             0
@@ -167,8 +167,8 @@ stringToRow string =
             -1
 
 
-stringToCol : String -> Int
-stringToCol string =
+stringToRow : String -> Int
+stringToRow string =
     case string of
         "8" ->
             0
@@ -236,16 +236,16 @@ stringToPlayer string =
             White
 
 
-isValidRowString : String -> Bool
-isValidRowString string =
+isValidColString : String -> Bool
+isValidColString string =
     if List.member string [ "a", "b", "c", "d", "e", "f", "g", "h" ] then
         True
     else
         False
 
 
-isValidColString : String -> Bool
-isValidColString string =
+isValidRowString : String -> Bool
+isValidRowString string =
     if List.member string [ "1", "2", "3", "4", "5", "6", "7", "8" ] then
         True
     else

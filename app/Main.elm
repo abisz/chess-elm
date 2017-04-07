@@ -196,6 +196,7 @@ view model =
                     , ( "height", "150px" )
                     ]
                 , value boardString
+                , onInput RenderBoard
                 ]
                 []
             ]
