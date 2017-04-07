@@ -66,6 +66,7 @@ hasFigure maybeField =
 
 isPawnMove : Matrix Field -> Field -> Field -> Player -> Bool
 isPawnMove board selectedField targetField player =
+    -- Todo: Pawn can't beat straight
     let
         xDiff =
             (Matrix.col targetField.loc) - (Matrix.col selectedField.loc)

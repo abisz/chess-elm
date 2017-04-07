@@ -86,4 +86,4 @@ drawBoard board selection =
         )
         board
         |> flatten
-        |> Html.div []
+        |> Html.div [ Style.boardStyles ]

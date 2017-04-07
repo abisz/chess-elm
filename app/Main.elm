@@ -5,17 +5,11 @@ import Html.Events exposing (..)
 import Html.Attributes exposing (..)
 import Matrix exposing (..)
 import Style
-import Helper exposing (..)
 import BoardView exposing (drawBoard)
 import Types exposing (..)
 import Move exposing (isMoveLegit)
 import Converter exposing (boardToString, stringToBoard)
 import BoardGenerator exposing (startBoard)
-
-
-fieldToText : Field -> String
-fieldToText field =
-    toString (row field.loc) ++ " / " ++ toString (Matrix.col field.loc)
 
 
 model : Model
@@ -168,37 +162,31 @@ view model =
 
         boardString =
             boardToString model.board
-
-        selection =
-            (case model.selected of
-                None ->
-                    "No Selection"
-
-                Active field ->
-                    fieldToText field
-            )
     in
         div []
-            [ h1 [ style [ ( "color", colorToCssString Style.blackColor ) ] ] [ text ("Elm Chess") ]
-            , text ("Selected: " ++ selection)
-            , text
-                ("Turn: "
-                    ++ (if model.turn == Black then
-                            "Black"
-                        else
-                            "White"
-                       )
-                )
-            , board
-            , textarea
-                [ style
-                    [ ( "width", "400px" )
-                    , ( "height", "150px" )
-                    ]
-                , value boardString
-                , onInput RenderBoard
+            [ h1 [ Style.headingStyles ] [ text ("Elm Chess") ]
+            , h2 [ Style.turnLineStyles ]
+                [ text
+                    ("Turn: "
+                        ++ (if model.turn == Black then
+                                "Black"
+                            else
+                                "White"
+                           )
+                    )
                 ]
-                []
+            , board
+
+            --            , textarea
+            --                [ style
+            --                    [ ( "width", "400px" )
+            --                    , ( "height", "150px" )
+            --                    ]
+            --                , value boardString
+            --                , onInput RenderBoard
+            --                ]
+            --                []
+            , Style.basicStyles
             ]
 
 
