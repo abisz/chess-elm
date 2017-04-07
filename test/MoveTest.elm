@@ -15,6 +15,7 @@ allTests =
         [ pawnMoveTest
         , knightMoveTest
         , bishopMoveTest
+        , rookMoveTest
         ]
 
 
@@ -115,6 +116,36 @@ bishopMoveTest =
                 \() ->
                     Expect.equal False <|
                         testMove "wb8a;wp1h;" (loc 0 0) (loc 7 7) Bishop White
+            ]
+        ]
+
+
+rookMoveTest : Test
+rookMoveTest =
+    describe "Rook Moves"
+        [ describe "Basic Move"
+            [ test "Default Success" <|
+                \() ->
+                    Expect.equal True <|
+                        testMove "wr8c;" (loc 0 2) (loc 0 7) Rook White
+            , test "Default Failure" <|
+                \() ->
+                    Expect.equal False <|
+                        testMove "br2e;" (loc 6 4) (loc 4 3) Rook Black
+            ]
+        , test "Jump Over Figure" <|
+            \() ->
+                Expect.equal False <|
+                    testMove "wr5h;bp5f;" (loc 3 7) (loc 3 3) Rook White
+        , describe "Beat Figure"
+            [ test "Different Color" <|
+                \() ->
+                    Expect.equal True <|
+                        testMove "br1a;wq1e;" (loc 7 0) (loc 7 4) Rook Black
+            , test "Same Color" <|
+                \() ->
+                    Expect.equal False <|
+                        testMove "br8b;bb4b;" (loc 0 1) (loc 4 1) Rook Black
             ]
         ]
 
