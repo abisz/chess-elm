@@ -222,41 +222,101 @@ stringToFigure string =
         _ ->
             Pawn
 
+stringToPlayer : String -> Player
+stringToPlayer string =
+    case string of
+        "w" ->
+            White
+        "b" ->
+            Black
+        _ ->
+            White
 
-stringToField : String -> Field
+
+isValidRowString : String -> Bool
+isValidRowString string =
+    if List.member string [ "a", "b", "c", "d", "e", "f", "g", "h" ] then
+        True
+    else
+        False
+
+
+isValidColString : String -> Bool
+isValidColString string =
+    if List.member string [ "1", "2", "3", "4", "5", "6", "7", "8" ] then
+        True
+    else
+        False
+
+
+isValidPlayerString : String -> Bool
+isValidPlayerString string =
+    if List.member string [ "b", "w" ] then
+        True
+    else
+        False
+
+
+isValidFigureString : String -> Bool
+isValidFigureString string =
+    if List.member string [ "p", "k", "r", "b", "q", "K" ] then
+        True
+    else
+        False
+
+
+stringToField : String -> Maybe Field
 stringToField string =
     let
+        rowString =
+            String.slice 2 3 string
+
+        validRow =
+            isValidRowString rowString
+
         row =
-            stringToRow <|
-                String.slice 2 3 string
+            stringToRow rowString
+
+        colString =
+            String.slice 3 4 string
+
+        validCol =
+            isValidColString colString
 
         col =
-            stringToCol <|
-                String.slice 3 4 string
+            stringToCol colString
 
         location =
             (loc row col)
 
+        playerString =
+            String.slice 0 1 string
+
+        validPlayer =
+            isValidPlayerString playerString
+
         player =
-            case String.slice 0 1 string of
-                "b" ->
-                    Black
+            stringToPlayer playerString
 
-                "w" ->
-                    White
+        figureString =
+            String.slice 1 2 string
 
-                _ ->
-                    White
+        validFigure =
+            isValidFigureString figureString
 
         figure =
-            { figure = stringToFigure <| String.slice 1 2 string
+            { figure = stringToFigure <| figureString
             , color = player
             }
     in
-        { loc = location
-        , color = getFieldColor location
-        , figure = Just figure
-        }
+        if validRow && validCol && validPlayer && validFigure then
+            Just
+                { loc = location
+                , color = getFieldColor location
+                , figure = Just figure
+                }
+        else
+            Nothing
 
 
 stringToBoard : String -> Matrix Field
@@ -266,7 +326,12 @@ stringToBoard string =
             String.split ";" string
                 |> List.foldl
                     (\fstr fields ->
-                        fields ++ [ (stringToField fstr) ]
+                        case (stringToField fstr) of
+                            Nothing ->
+                                fields
+
+                            Just parsedField ->
+                                fields ++ [ parsedField ]
                     )
                     []
     in
