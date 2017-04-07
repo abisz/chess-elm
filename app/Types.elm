@@ -28,7 +28,6 @@ type alias Field =
     { loc : Location
     , color : Color
     , figure : Maybe Figure
-    , isSelected : Bool
     }
 
 
@@ -46,3 +45,4 @@ type alias Model =
 
 type Msg
     = ClickField Field
+    | RenderBoard String

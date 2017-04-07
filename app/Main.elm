@@ -39,18 +39,6 @@ fieldAlreadySelected selected field =
                 False
 
 
-updateBoardSelection : Matrix Field -> Field -> Matrix Field
-updateBoardSelection board field =
-    Matrix.map
-        (\f ->
-            if ((f.loc == field.loc) && f.figure /= Nothing) then
-                { f | isSelected = True }
-            else
-                { f | isSelected = False }
-        )
-        board
-
-
 selectField : Model -> Field -> Model
 selectField model clickedField =
     let
@@ -62,25 +50,13 @@ selectField model clickedField =
 
         alreadySelected =
             fieldAlreadySelected model.selected clickedField
-
-        board =
-            if alreadySelected then
-                Matrix.map (\f -> { f | isSelected = False }) model.board
-            else
-                updateBoardSelection model.board clickedField
     in
         if noFigure then
             model
         else if alreadySelected then
-            { model
-                | selected = None
-                , board = board
-            }
+            { model | selected = None }
         else
-            { model
-                | selected = (Active clickedField)
-                , board = board
-            }
+            { model | selected = (Active clickedField) }
 
 
 changeTurnPlayer : Player -> Player
@@ -94,14 +70,6 @@ changeTurnPlayer player =
 makeMove : Model -> Field -> Model
 makeMove model targetField =
     let
-        isSelected =
-            case model.selected of
-                None ->
-                    False
-
-                Active activeField ->
-                    True
-
         legitMove =
             isMoveLegit model.board model.selected targetField
 
@@ -116,7 +84,7 @@ makeMove model targetField =
                             if f.loc == targetField.loc then
                                 { f | figure = playerField.figure }
                             else if f.loc == playerField.loc then
-                                { f | figure = Nothing, isSelected = False }
+                                { f | figure = Nothing }
                             else
                                 f
                         )
@@ -188,12 +156,15 @@ update msg model =
         ClickField field ->
             clickField model field
 
+        RenderBoard string ->
+            { model | board = (stringToBoard (String.trim string)), selected = None }
+
 
 view : Model -> Html Msg
 view model =
     let
         board =
-            drawBoard model.board
+            drawBoard model.board model.selected
 
         selection =
             (case model.selected of
@@ -216,8 +187,14 @@ view model =
                        )
                 )
             , board
-            , text (boardString model.board)
-            , (drawBoard <| stringToBoard <| boardString model.board)
+            , textarea
+                [ onInput RenderBoard
+                , style
+                    [ ( "width", "400px" )
+                    , ( "height", "150px" )
+                    ]
+                ]
+                [ text (boardString model.board) ]
             ]
 
 

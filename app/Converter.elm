@@ -256,7 +256,6 @@ stringToField string =
         { loc = location
         , color = getFieldColor location
         , figure = Just figure
-        , isSelected = False
         }
 
 
@@ -287,7 +286,6 @@ stringToBoard string =
                             { color = (getFieldColor l)
                             , loc = l
                             , figure = Nothing
-                            , isSelected = False
                             }
 
                         Just field ->

@@ -52,23 +52,35 @@ drawFigure field =
                         "♔"
 
 
-drawField : Field -> Html Msg
-drawField field =
-    div
-        [ (Style.fieldStyles
-            (if field.isSelected then
-                Style.selectionColor
-             else
-                field.color
-            )
-          )
-        , onClick (ClickField field)
-        ]
-        [ div [] [ text (drawFigure field) ] ]
+fieldIsSelected : Field -> Selection -> Bool
+fieldIsSelected field selection =
+    case selection of
+        None ->
+            False
+
+        Active f ->
+            if f.loc == field.loc then
+                True
+            else
+                False
 
 
-drawBoard : Matrix Field -> Html Msg
-drawBoard board =
-    Matrix.map drawField board
+drawBoard : Matrix Field -> Selection -> Html Msg
+drawBoard board selection =
+    Matrix.map
+        (\field ->
+            div
+                [ (Style.fieldStyles
+                    (if fieldIsSelected field selection then
+                        Style.selectionColor
+                     else
+                        field.color
+                    )
+                  )
+                , onClick (ClickField field)
+                ]
+                [ div [] [ text (drawFigure field) ] ]
+        )
+        board
         |> flatten
         |> Html.div []

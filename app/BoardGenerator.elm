@@ -58,6 +58,5 @@ startBoard =
             { color = (getFieldColor l)
             , loc = l
             , figure = (getDefaultFigure l)
-            , isSelected = False
             }
         )
