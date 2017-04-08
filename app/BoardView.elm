@@ -2,7 +2,9 @@ module BoardView exposing (drawBoard)
 
 import Types exposing (..)
 import Html exposing (..)
+import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import CssBasics exposing (..)
 import Style exposing (..)
 import Matrix exposing (..)
 import Move exposing (isMoveLegit)
@@ -71,15 +73,18 @@ drawBoard board selection =
     Matrix.map
         (\field ->
             div
-                [ (Style.fieldStyles
-                    (if fieldIsSelected field selection then
-                        Style.selectionColor
-                     else if isMoveLegit board selection field then
-                        Style.targetColor
-                     else
-                        field.color
-                    )
-                  )
+                [ attribute "class" "field"
+                , style
+                    [ ( "background-color"
+                      , encodeCssValue <|
+                                if fieldIsSelected field selection then
+                                    Col Style.selectionColor
+                                else if isMoveLegit board selection field then
+                                    Col Style.targetColor
+                                else
+                                    Col field.color
+                      )
+                    ]
                 , onClick (ClickField field)
                 ]
                 [ div [] [ text (drawFigure field) ] ]
