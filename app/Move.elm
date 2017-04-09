@@ -49,24 +49,8 @@ isMoveLegit board selected targetField =
                                 moveIsPossible board selectedField targetField selectedFigure
 
 
-hasFigure : Maybe Field -> Bool
-hasFigure maybeField =
-    case maybeField of
-        Nothing ->
-            False
-
-        Just field ->
-            case field.figure of
-                Nothing ->
-                    False
-
-                _ ->
-                    True
-
-
 isPawnMove : Matrix Field -> Field -> Field -> Player -> Bool
 isPawnMove board selectedField targetField player =
-    -- Todo: Pawn can't beat straight
     let
         xDiff =
             (Matrix.col targetField.loc) - (Matrix.col selectedField.loc)
@@ -91,14 +75,21 @@ isPawnMove board selectedField targetField player =
                                     )
                            )
                    )
-                && (xDiff == 0 || (hasEnemyFigure targetField player && (abs yDiff) <= 1))
+                && ((xDiff == 0 && (not (hasFigure (Just targetField))))
+                        || (hasEnemyFigure targetField player
+                                && (abs yDiff)
+                                == 1
+                                && (abs xDiff)
+                                == 1
+                           )
+                   )
             )
         then
             True
         else if
             (player
                 == White
-                && (yDiff
+                && ((yDiff
                         == -1
                         || (((Matrix.row selectedField.loc) == 6 && yDiff == -2))
                         && not
@@ -110,8 +101,16 @@ isPawnMove board selectedField targetField player =
                                     )
                                     board
                             )
+                    )
                    )
-                && (xDiff == 0 || (hasEnemyFigure targetField player && (abs yDiff) <= 1))
+                && ((xDiff == 0 && (not (hasFigure (Just targetField))))
+                        || (hasEnemyFigure targetField player
+                                && (abs yDiff)
+                                == 1
+                                && (abs xDiff)
+                                == 1
+                           )
+                   )
             )
         then
             True
@@ -189,6 +188,21 @@ isQueenMove board selectedField targetField =
 
 
 -- Helper
+
+
+hasFigure : Maybe Field -> Bool
+hasFigure maybeField =
+    case maybeField of
+        Nothing ->
+            False
+
+        Just field ->
+            case field.figure of
+                Nothing ->
+                    False
+
+                _ ->
+                    True
 
 
 hasEnemyFigure : Field -> Player -> Bool

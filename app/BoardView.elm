@@ -77,12 +77,12 @@ drawBoard board selection =
                 , style
                     [ ( "background-color"
                       , encodeCssValue <|
-                                if fieldIsSelected field selection then
-                                    Col Style.selectionColor
-                                else if isMoveLegit board selection field then
-                                    Col Style.targetColor
-                                else
-                                    Col field.color
+                            if fieldIsSelected field selection then
+                                Col Style.selectionColor
+                            else if isMoveLegit board selection field then
+                                Col Style.targetColor
+                            else
+                                Col field.color
                       )
                     ]
                 , onClick (ClickField field)

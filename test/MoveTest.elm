@@ -56,18 +56,24 @@ pawnMoveTest =
                     Expect.equal False <|
                         testMove "bp7c;wp5b;" (loc 1 2) (loc 3 1) Pawn Black
             ]
-        , test "Can't beat same color" <|
-            \() ->
-                Expect.equal False <|
-                    testMove "wp2a;wp3a;" (loc 6 0) (loc 5 0) Pawn White
-        , test "Can beat other color straight" <|
-            \() ->
-                Expect.equal True <|
-                    testMove "wp2a;bp3a;" (loc 6 0) (loc 5 0) Pawn White
-        , test "Can beat other color diagonal" <|
-            \() ->
-                Expect.equal True <|
-                    testMove "wp2a;bp3b;" (loc 6 0) (loc 5 1) Pawn White
+        , describe "Beating"
+            [ test "Can't beat straight" <|
+                \() ->
+                    Expect.equal False <|
+                        testMove "bp4d;wp3d;" (loc 4 3) (loc 5 3) Pawn Black
+            , test "Can't beat same color" <|
+                \() ->
+                    Expect.equal False <|
+                        testMove "wp2a;wp3a;" (loc 6 0) (loc 5 0) Pawn White
+            , test "Can't beat other color double straight" <|
+                \() ->
+                    Expect.equal False <|
+                        testMove "wp2a;bp4a;" (loc 6 0) (loc 4 0) Pawn White
+            , test "Can beat other color diagonal" <|
+                \() ->
+                    Expect.equal True <|
+                        testMove "wp2a;bp3b;" (loc 6 0) (loc 5 1) Pawn White
+            ]
         ]
 
 
