@@ -8,8 +8,8 @@ import Style
 import BoardView exposing (drawBoard)
 import Types exposing (..)
 import Move exposing (isMoveLegit)
-import Converter exposing (boardToString, stringToBoard)
-import BoardGenerator exposing (startBoard)
+import Converter exposing (boardToString)
+import BoardGenerator exposing (startBoard, boardFromString)
 
 
 model : Model
@@ -151,7 +151,7 @@ update msg model =
             clickField model field
 
         RenderBoard string ->
-            { model | board = (stringToBoard (String.trim string)), selected = None }
+            { model | board = (boardFromString (String.trim string)), selected = None }
 
 
 view : Model -> Html Msg

@@ -4,8 +4,7 @@ import Test exposing (Test, describe, test)
 import Types exposing (..)
 import Matrix exposing (..)
 import Move exposing (isMoveLegit)
-import BoardGenerator exposing (getFieldColor)
-import Converter exposing (stringToBoard, stringToField)
+import BoardGenerator exposing (getFieldColor, boardFromString, fieldFromString)
 import Expect
 
 
@@ -236,7 +235,7 @@ testMove : String -> Location -> Location -> ChessFigure -> Player -> Bool
 testMove boardString selectedLocation targetLocation chessFigure player =
     let
         testBoard =
-            stringToBoard boardString
+            boardFromString boardString
 
         selectedField =
             { loc = selectedLocation
