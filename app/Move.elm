@@ -1,8 +1,53 @@
-module Move exposing (isMoveLegit, isCheckMate)
+module Move exposing (isMoveLegit, isCheckMate, isCheck)
 
 import Types exposing (..)
 import Matrix exposing (..)
 import Converter exposing (boardToString)
+import BoardGenerator exposing (getFieldColor)
+
+
+isCheck : Matrix Field -> Player -> Bool
+isCheck board player =
+    let
+        kingField =
+            Matrix.flatten board
+                |> List.foldl
+                    (\f field ->
+                        case f.figure of
+                            Nothing ->
+                                field
+
+                            Just figure ->
+                                if
+                                    ((figure.figure == King)
+                                        && (figure.color == player)
+                                    )
+                                then
+                                    f
+                                else
+                                    field
+                    )
+                    { loc = (loc -1 -1), color = getFieldColor (loc -1 -1), figure = Nothing }
+    in
+        Matrix.flatten board
+            |> List.foldl
+                (\f check ->
+                    if check then
+                        True
+                    else
+                        case f.figure of
+                            Nothing ->
+                                False
+
+                            Just figure ->
+                                if figure.color == player then
+                                    False
+                                else if moveIsPossible board f kingField figure then
+                                    True
+                                else
+                                    False
+                )
+                False
 
 
 isCheckMate : Matrix Field -> Bool
@@ -41,25 +86,45 @@ moveIsPossible board selectedField targetField figure =
 
 isMoveLegit : Matrix Field -> Selection -> Field -> Bool
 isMoveLegit board selected targetField =
-    case selected of
-        None ->
-            False
+    let
+        updatedBoard =
+            case selected of
+                None ->
+                    board
 
-        Active selectedField ->
-            case selectedField.figure of
-                Nothing ->
-                    False
-
-                Just selectedFigure ->
-                    case targetField.figure of
-                        Nothing ->
-                            moveIsPossible board selectedField targetField selectedFigure
-
-                        Just targetFigure ->
-                            if targetFigure.color == selectedFigure.color then
-                                False
+                Active playerField ->
+                    Matrix.map
+                        (\f ->
+                            if f.loc == targetField.loc then
+                                { f | figure = playerField.figure }
+                            else if f.loc == playerField.loc then
+                                { f | figure = Nothing }
                             else
-                                moveIsPossible board selectedField targetField selectedFigure
+                                f
+                        )
+                        board
+    in
+        case selected of
+            None ->
+                False
+
+            Active selectedField ->
+                case selectedField.figure of
+                    Nothing ->
+                        False
+
+                    Just selectedFigure ->
+                        case targetField.figure of
+                            Nothing ->
+                                (moveIsPossible board selectedField targetField selectedFigure)
+                                    && (not (isCheck updatedBoard selectedFigure.color))
+
+                            Just targetFigure ->
+                                if targetFigure.color == selectedFigure.color then
+                                    False
+                                else
+                                    (moveIsPossible board selectedField targetField selectedFigure)
+                                        && (not (isCheck updatedBoard selectedFigure.color))
 
 
 isPawnMove : Matrix Field -> Field -> Field -> Player -> Bool

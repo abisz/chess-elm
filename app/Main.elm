@@ -197,16 +197,15 @@ view model =
             , h2 [ Style.turnLineStyles ]
                 [ turnLine ]
             , board
-
-            --            , textarea
-            --                [ style
-            --                    [ ( "width", "400px" )
-            --                    , ( "height", "150px" )
-            --                    ]
-            --                , value boardString
-            --                , onInput RenderBoard
-            --                ]
-            --                []
+            , textarea
+                [ style
+                    [ ( "width", "400px" )
+                    , ( "height", "150px" )
+                    ]
+                , value boardString
+                , onInput RenderBoard
+                ]
+                []
             , Style.basicStyles
             ]
 

@@ -3,7 +3,7 @@ module MoveTest exposing (allTests)
 import Test exposing (Test, describe, test)
 import Types exposing (..)
 import Matrix exposing (..)
-import Move exposing (isMoveLegit, isCheckMate)
+import Move exposing (isMoveLegit, isCheckMate, isCheck)
 import BoardGenerator exposing (getFieldColor, boardFromString, fieldFromString)
 import Expect
 
@@ -18,6 +18,29 @@ allTests =
         , queenMoveTest
         , kingMoveTest
         , checkMateTest
+        , checkTest
+        ]
+
+
+checkTest : Test
+checkTest =
+    describe "Check"
+        [ test "Should be Check" <|
+            \() ->
+                Expect.equal True <|
+                    isCheck (boardFromString "wK1a;bb8h;") White
+        , test "Shouldn't be Check" <|
+            \() ->
+                Expect.equal False <|
+                    isCheck (boardFromString "bK4g;wp2d;") Black
+        , test "Should be Check" <|
+            \() ->
+                Expect.equal True <|
+                    isCheck (boardFromString "bb8a;wk5g;bK2a;wK1h;") White
+        , test "Shouldn't be Check" <|
+            \() ->
+                Expect.equal False <|
+                    isCheck (boardFromString "bb8a;wk5g;bK2a;wK2h;") White
         ]
 
 
@@ -51,6 +74,10 @@ pawnMoveTest =
                 \() ->
                     Expect.equal False <|
                         testMove "wp4a;" (loc 4 0) (loc 3 1) Pawn White
+            , test "Can't cause Check for itself" <|
+                \() ->
+                    Expect.equal False <|
+                        testMove "wp4c;wK4b;br4d;" (loc 4 2) (loc 5 2) Pawn White
             ]
         , describe "Double Move"
             [ test "Possible for First Move" <|
@@ -103,6 +130,10 @@ knightMoveTest =
                 \() ->
                     Expect.equal False <|
                         testMove "bk5d;" (loc 3 3) (loc 3 4) Knight Black
+            , test "Can't cause Check for itself" <|
+                \() ->
+                    Expect.equal False <|
+                        testMove "wk3f;wK1h;bb8a;bK1a;" (loc 5 5) (loc 3 6) Knight White
             ]
         , test "Jump over Figure" <|
             \() ->
@@ -132,6 +163,10 @@ bishopMoveTest =
                 \() ->
                     Expect.equal False <|
                         testMove "bb4c;" (loc 4 2) (loc 4 0) Bishop Black
+            , test "Can't cause Check for itself" <|
+                \() ->
+                    Expect.equal False <|
+                        testMove "bb4b;bK4a;wk3c;" (loc 4 1) (loc 3 2) Bishop Black
             ]
         , test "Jump Over Figure" <|
             \() ->
@@ -162,6 +197,10 @@ rookMoveTest =
                 \() ->
                     Expect.equal False <|
                         testMove "br2e;" (loc 6 4) (loc 4 3) Rook Black
+            , test "Can't cause Check for itself" <|
+                \() ->
+                    Expect.equal False <|
+                        testMove "wr1a;wK1e;bq5a;" (loc 7 0) (loc 5 0) Rook White
             ]
         , test "Jump Over Figure" <|
             \() ->
@@ -192,6 +231,10 @@ queenMoveTest =
                 \() ->
                     Expect.equal False <|
                         testMove "bq8g;" (loc 0 6) (loc 1 3) Queen Black
+            , test "Can't cause Check for itself" <|
+                \() ->
+                    Expect.equal False <|
+                        testMove "bq5e;bK7g;wp6f;" (loc 3 4) (loc 2 3) Queen Black
             ]
         , describe "Basic Bishop Move"
             [ test "Default Success" <|
@@ -202,6 +245,10 @@ queenMoveTest =
                 \() ->
                     Expect.equal False <|
                         testMove "bq7f;" (loc 1 5) (loc 5 6) Queen Black
+            , test "Can't cause Check for itself" <|
+                \() ->
+                    Expect.equal False <|
+                        testMove "wq1d;wK1e;bk3f;" (loc 7 3) (loc 4 0) Queen White
             ]
         , test "Jump Over Figure" <|
             \() ->
@@ -232,6 +279,10 @@ kingMoveTest =
                 \() ->
                     Expect.equal False <|
                         testMove "bK4f;" (loc 4 5) (loc 1 3) King Black
+            , test "Can't cause Check for itself" <|
+                \() ->
+                    Expect.equal False <|
+                        testMove "wK3d;bp5e;" (loc 5 3) (loc 4 3) King White
             ]
         , describe "Beat Figure"
             [ test "Different Color" <|
