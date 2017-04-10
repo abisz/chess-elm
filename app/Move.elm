@@ -1,7 +1,20 @@
-module Move exposing (isMoveLegit)
+module Move exposing (isMoveLegit, isCheckMate)
 
 import Types exposing (..)
 import Matrix exposing (..)
+import Converter exposing (boardToString)
+
+
+isCheckMate : Matrix Field -> Bool
+isCheckMate board =
+    let
+        boardString =
+            boardToString board
+    in
+        not
+            (String.contains "wK" boardString
+                && String.contains "bK" boardString
+            )
 
 
 moveIsPossible : Matrix Field -> Field -> Field -> Figure -> Bool

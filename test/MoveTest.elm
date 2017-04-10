@@ -3,7 +3,7 @@ module MoveTest exposing (allTests)
 import Test exposing (Test, describe, test)
 import Types exposing (..)
 import Matrix exposing (..)
-import Move exposing (isMoveLegit)
+import Move exposing (isMoveLegit, isCheckMate)
 import BoardGenerator exposing (getFieldColor, boardFromString, fieldFromString)
 import Expect
 
@@ -17,6 +17,21 @@ allTests =
         , rookMoveTest
         , queenMoveTest
         , kingMoveTest
+        , checkMateTest
+        ]
+
+
+checkMateTest : Test
+checkMateTest =
+    describe "Check Mate"
+        [ test "Should be Check Mate" <|
+            \() ->
+                Expect.equal True <|
+                    isCheckMate (boardFromString "wK1a;")
+        , test "Shouldn't be Check Mate" <|
+            \() ->
+                Expect.equal False <|
+                    isCheckMate (boardFromString "bK2a;wK4d;")
         ]
 
 

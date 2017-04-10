@@ -40,6 +40,7 @@ type alias Model =
     { board : Matrix Field
     , selected : Selection
     , turn : Player
+    , checkMate : Bool
     }
 
 

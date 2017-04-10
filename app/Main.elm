@@ -7,17 +7,9 @@ import Matrix exposing (..)
 import Style
 import BoardView exposing (drawBoard)
 import Types exposing (..)
-import Move exposing (isMoveLegit)
+import Move exposing (isMoveLegit, isCheckMate)
 import Converter exposing (boardToString)
 import BoardGenerator exposing (startBoard, boardFromString)
-
-
-model : Model
-model =
-    { board = startBoard
-    , selected = None
-    , turn = Black
-    }
 
 
 fieldAlreadySelected : Selection -> Field -> Bool
@@ -84,6 +76,9 @@ makeMove model targetField =
                         )
                         model.board
 
+        checkMate =
+            isCheckMate updatedBoard
+
         changeTurn =
             case model.selected of
                 None ->
@@ -96,8 +91,9 @@ makeMove model targetField =
             { model
                 | selected = None
                 , board = updatedBoard
+                , checkMate = checkMate
                 , turn =
-                    (if changeTurn then
+                    (if changeTurn && not checkMate then
                         changeTurnPlayer model.turn
                      else
                         model.turn
@@ -138,10 +134,21 @@ clickField model clickedField =
                                 Just figurePlayer ->
                                     figure.color == figurePlayer.color
     in
-        if legitSelection then
+        if model.checkMate then
+            model
+        else if legitSelection then
             selectField model clickedField
         else
             makeMove model clickedField
+
+
+model : Model
+model =
+    { board = startBoard
+    , selected = None
+    , turn = Black
+    , checkMate = False
+    }
 
 
 update : Msg -> Model -> Model
@@ -162,11 +169,21 @@ view model =
 
         boardString =
             boardToString model.board
-    in
-        div []
-            [ h1 [ Style.headingStyles ] [ text ("Elm Chess") ]
-            , h2 [ Style.turnLineStyles ]
-                [ text
+
+        currentPlayer =
+            if model.turn == Black then
+                "Black"
+            else
+                "White"
+
+        turnLine =
+            if model.checkMate then
+                text
+                    ("Checkmate: The Winner is "
+                        ++ currentPlayer
+                    )
+            else
+                text
                     ("Turn: "
                         ++ (if model.turn == Black then
                                 "Black"
@@ -174,7 +191,11 @@ view model =
                                 "White"
                            )
                     )
-                ]
+    in
+        div []
+            [ h1 [ Style.headingStyles ] [ text ("Elm Chess") ]
+            , h2 [ Style.turnLineStyles ]
+                [ turnLine ]
             , board
 
             --            , textarea
