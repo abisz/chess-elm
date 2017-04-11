@@ -10,6 +10,7 @@ import Types exposing (..)
 import Move exposing (isMoveLegit, isCheckMate)
 import Converter exposing (boardToString)
 import BoardGenerator exposing (startBoard, boardFromString)
+import WebSocket
 
 
 fieldAlreadySelected : Selection -> Field -> Bool
@@ -142,23 +143,37 @@ clickField model clickedField =
             makeMove model clickedField
 
 
-model : Model
-model =
-    { board = startBoard
-    , selected = None
-    , turn = White
-    , checkMate = False
-    }
+echoServer : String
+echoServer =
+        "ws://localhost:3000/socket.io/?EIO=3&transport=websocket"
 
 
-update : Msg -> Model -> Model
+init : ( Model, Cmd Msg )
+init =
+    ( { board = startBoard
+      , selected = None
+      , turn = White
+      , checkMate = False
+      , message = ""
+      }
+    , WebSocket.send echoServer "connection"
+    )
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ClickField field ->
-            clickField model field
+            ( clickField model field, Cmd.none )
 
         RenderBoard string ->
-            { model | board = (boardFromString (String.trim string)), selected = None }
+            ( { model | board = (boardFromString (String.trim string)), selected = None }, Cmd.none )
+
+        NewMessage string ->
+            ( { model | message = string }, Cmd.none )
+
+        SendMessage string ->
+            ( model, WebSocket.send echoServer string )
 
 
 view : Model -> Html Msg
@@ -194,6 +209,7 @@ view model =
     in
         div []
             [ h1 [ Style.headingStyles ] [ text ("Elm Chess") ]
+            , text (model.message)
             , h2 [ Style.turnLineStyles ]
                 [ turnLine ]
             , board
@@ -210,9 +226,15 @@ view model =
             ]
 
 
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    WebSocket.listen echoServer NewMessage
+
+
 main =
-    Html.beginnerProgram
-        { model = model
+    Html.program
+        { init = init
         , update = update
         , view = view
+        , subscriptions = subscriptions
         }

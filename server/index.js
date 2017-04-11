@@ -3,8 +3,10 @@ const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 
 io.on('connection', (socket) => {
-  socket.broadcast.emit('new connection', {
-    foo: "bar",
+  console.log(`new connection: ${socket.id}`);
+
+  io.emit('new connection', {
+    id: socket.id,
   });
 });
 

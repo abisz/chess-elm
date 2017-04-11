@@ -41,9 +41,12 @@ type alias Model =
     , selected : Selection
     , turn : Player
     , checkMate : Bool
+    , message : String
     }
 
 
 type Msg
     = ClickField Field
     | RenderBoard String
+    | NewMessage String
+    | SendMessage String
