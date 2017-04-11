@@ -146,7 +146,7 @@ model : Model
 model =
     { board = startBoard
     , selected = None
-    , turn = Black
+    , turn = White
     , checkMate = False
     }
 

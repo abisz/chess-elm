@@ -271,6 +271,7 @@ isQueenMove board selectedField targetField =
 
 isCastlingMove : Matrix Field -> Field -> Field -> Player -> Bool
 isCastlingMove board selectedField targetField player =
+    -- Todo: Castling Rights
     let
         leftRookLocation =
             if player == White then

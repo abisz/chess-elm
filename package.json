@@ -1,0 +1,18 @@
+{
+  "name": "chess-elm",
+  "version": "0.0.0",
+  "main": "server/index.js",
+  "repository": {
+    "url": "https://github.com/abisz/chess-elm.git",
+    "type": "git"
+  },
+  "scripts": {
+    "start": "node ./server/index.js"
+  },
+  "author": "Simon Reinsperger <reinsperger.smn@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.15.2",
+    "socket.io": "^1.7.3"
+  }
+}
