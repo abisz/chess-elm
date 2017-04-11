@@ -19,6 +19,49 @@ allTests =
         , kingMoveTest
         , checkMateTest
         , checkTest
+        , castlingTest
+        ]
+
+
+castlingTest : Test
+castlingTest =
+    describe "Castling"
+        [ test "Left White Castling works" <|
+            \() ->
+                Expect.equal True <|
+                    testMove "wr1a;wK1e;" (loc 7 4) (loc 7 2) King White
+        , test "Left White Castling not allowed" <|
+            \() ->
+                Expect.equal False <|
+                    testMove "wK1e;" (loc 7 4) (loc 7 2) King White
+        , test "Not Allowed if fields are not empty" <|
+            \() ->
+                Expect.equal False <|
+                    testMove "wK1e;wp1c;wr1a;" (loc 7 4) (loc 7 2) King White
+        , test "Only possible from start position" <|
+            \() ->
+                Expect.equal False <|
+                    testMove "wr1a;wK3e;" (loc 5 4) (loc 5 2) King White
+        , test "Not possible if King is in Check" <|
+            \() ->
+                Expect.equal False <|
+                    testMove "wr1a;wK1e;bb4b;" (loc 7 4) (loc 7 2) King White
+        , test "Right Black Castling works" <|
+            \() ->
+                Expect.equal True <|
+                    testMove "bK8e;br8h;" (loc 0 4) (loc 0 6) King Black
+        , test "Left Black Castling not allowed if there is a Figure in betweend" <|
+            \() ->
+                Expect.equal False <|
+                    testMove "bK8e;br8a;bb8b;" (loc 0 4) (loc 0 2) King Black
+        , test "Right Black Castling not allowed if there is a Figure in between" <|
+            \() ->
+                Expect.equal False <|
+                    testMove "bK8e;bb8f;br8h;" (loc 0 4) (loc 0 6) King Black
+        , test "May not move thorugh attacked field" <|
+            \() ->
+                Expect.equal False <|
+                    testMove "br5d;wr1a;wK1e;" (loc 7 4) (loc 7 2) King White
         ]
 
 

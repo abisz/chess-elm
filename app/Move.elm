@@ -27,7 +27,7 @@ isCheck board player =
                                 else
                                     field
                     )
-                    { loc = (loc -1 -1), color = getFieldColor (loc -1 -1), figure = Nothing }
+                    dummyField
     in
         Matrix.flatten board
             |> List.foldl
@@ -116,7 +116,12 @@ isMoveLegit board selected targetField =
                     Just selectedFigure ->
                         case targetField.figure of
                             Nothing ->
-                                (moveIsPossible board selectedField targetField selectedFigure)
+                                ((moveIsPossible board selectedField targetField selectedFigure)
+                                    || (selectedFigure.figure
+                                            == King
+                                            && isCastlingMove board selectedField targetField selectedFigure.color
+                                       )
+                                )
                                     && (not (isCheck updatedBoard selectedFigure.color))
 
                             Just targetFigure ->
@@ -264,8 +269,144 @@ isQueenMove board selectedField targetField =
         || isRookMove board selectedField targetField
 
 
+isCastlingMove : Matrix Field -> Field -> Field -> Player -> Bool
+isCastlingMove board selectedField targetField player =
+    let
+        leftRookLocation =
+            if player == White then
+                (loc 7 0)
+            else
+                (loc 0 0)
+
+        rightRookLocation =
+            if player == White then
+                (loc 7 7)
+            else
+                (loc 0 7)
+
+        leftRookField =
+            case (Matrix.get leftRookLocation board) of
+                Nothing ->
+                    dummyField
+
+                Just field ->
+                    field
+
+        leftCastlingFieldsEmpty =
+            if player == White then
+                not
+                    ((hasFigure (Matrix.get (loc 7 2) board))
+                        || (hasFigure (Matrix.get (loc 7 3) board))
+                        || (hasFigure (Matrix.get (loc 7 1) board))
+                    )
+            else
+                not
+                    ((hasFigure (Matrix.get (loc 0 2) board))
+                        || (hasFigure (Matrix.get (loc 0 3) board))
+                        || (hasFigure (Matrix.get (loc 0 1) board))
+                    )
+
+        leftCastlingFieldsNotAttacked =
+            if player == White then
+                not
+                    ((isAttackedByEnemy board (loc 7 2) White)
+                        || (isAttackedByEnemy board (loc 7 3) White)
+                    )
+            else
+                not
+                    ((isAttackedByEnemy board (loc 0 2) White)
+                        || (isAttackedByEnemy board (loc 0 3) White)
+                    )
+
+        rightRookField =
+            case (Matrix.get rightRookLocation board) of
+                Nothing ->
+                    dummyField
+
+                Just field ->
+                    field
+
+        rightCastlingFieldsEmpty =
+            if player == White then
+                not
+                    ((hasFigure (Matrix.get (loc 7 5) board))
+                        || (hasFigure (Matrix.get (loc 7 6) board))
+                    )
+            else
+                not
+                    ((hasFigure (Matrix.get (loc 0 5) board))
+                        || (hasFigure (Matrix.get (loc 0 6) board))
+                    )
+
+        rightCastlingFieldsNotAttacked =
+            if player == White then
+                not
+                    ((isAttackedByEnemy board (loc 7 5) White)
+                        || (isAttackedByEnemy board (loc 7 6) White)
+                    )
+            else
+                not
+                    ((isAttackedByEnemy board (loc 0 5) Black)
+                        || (isAttackedByEnemy board (loc 0 6) Black)
+                    )
+
+        xDiff =
+            (Matrix.col targetField.loc) - (Matrix.col selectedField.loc)
+
+        yDiff =
+            (row targetField.loc) - (row selectedField.loc)
+    in
+        if
+            ((abs xDiff)
+                <= 1
+                && (abs yDiff)
+                <= 1
+                && not (xDiff == 0 && yDiff == 0)
+            )
+                -- Castling
+                || (yDiff
+                        == 0
+                        -- Startposition
+                        && ((player == White && (row selectedField.loc) == 7)
+                                || (player == Black && (row selectedField.loc) == 0)
+                           )
+                        -- Cannot be Check
+                        && (not (isCheck board player))
+                        && (-- Kingside
+                            (xDiff
+                                == -2
+                                -- Rook needs to be correct position
+                                && (hasSpecificFigure leftRookField player Rook)
+                                -- Fields in between need to be empty
+                                && leftCastlingFieldsEmpty
+                                -- Fields in between cannot be attacked
+                                && leftCastlingFieldsNotAttacked
+                            )
+                                || -- Queenside
+                                   (xDiff
+                                        == 2
+                                        -- Rook needs to be correct position
+                                        && (hasSpecificFigure rightRookField player Rook)
+                                        -- Fields in between need to be empty
+                                        && rightCastlingFieldsEmpty
+                                        -- Fields in between cannot be attacked
+                                        && rightCastlingFieldsNotAttacked
+                                   )
+                           )
+                   )
+        then
+            True
+        else
+            False
+
+
 
 -- Helper
+
+
+dummyField : Field
+dummyField =
+    { loc = (loc -1 -1), color = getFieldColor (loc -1 -1), figure = Nothing }
 
 
 hasFigure : Maybe Field -> Bool
@@ -294,6 +435,50 @@ hasEnemyFigure field player =
                 False
             else
                 True
+
+
+hasSpecificFigure : Field -> Player -> ChessFigure -> Bool
+hasSpecificFigure field color chessFigure =
+    case field.figure of
+        Nothing ->
+            False
+
+        Just figure ->
+            if figure.color == color && figure.figure == chessFigure then
+                True
+            else
+                False
+
+
+isAttackedByEnemy : Matrix Field -> Location -> Player -> Bool
+isAttackedByEnemy board location player =
+    Matrix.flatten board
+        |> List.foldl
+            (\f isAttacked ->
+                if isAttacked then
+                    True
+                else
+                    hasEnemyFigure f player
+                        && (moveIsPossible board
+                                f
+                                (case (Matrix.get location board) of
+                                    Nothing ->
+                                        dummyField
+
+                                    Just field ->
+                                        field
+                                )
+                                (case f.figure of
+                                    Nothing ->
+                                        -- dummy pawn, same color
+                                        { figure = Pawn, color = player }
+
+                                    Just figure ->
+                                        figure
+                                )
+                           )
+            )
+            False
 
 
 nothingBetweenFieldsCross : Matrix Field -> Field -> Field -> Bool
