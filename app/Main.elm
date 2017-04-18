@@ -10,7 +10,7 @@ import Types exposing (..)
 import Move exposing (isMoveLegit, isCheckMate)
 import Converter exposing (boardToString)
 import BoardGenerator exposing (startBoard, boardFromString)
-import WebSocket
+import ChessSocket exposing (..)
 
 
 fieldAlreadySelected : Selection -> Field -> Bool
@@ -143,9 +143,18 @@ clickField model clickedField =
             makeMove model clickedField
 
 
-echoServer : String
-echoServer =
-        "ws://localhost:3000/socket.io/?EIO=3&transport=websocket"
+newMessage : Model -> String -> Model
+newMessage model string =
+    let
+        message =
+            case (decodeMessage string) of
+                Error string ->
+                    "Error: " ++ string
+
+                NewConnection ->
+                    "New Connection"
+    in
+        { model | message = message }
 
 
 init : ( Model, Cmd Msg )
@@ -156,7 +165,7 @@ init =
       , checkMate = False
       , message = ""
       }
-    , WebSocket.send echoServer "connection"
+    , initConnection
     )
 
 
@@ -170,10 +179,10 @@ update msg model =
             ( { model | board = (boardFromString (String.trim string)), selected = None }, Cmd.none )
 
         NewMessage string ->
-            ( { model | message = string }, Cmd.none )
+            ( newMessage model string, Cmd.none )
 
         SendMessage string ->
-            ( model, WebSocket.send echoServer string )
+            ( model, sendMessage string )
 
 
 view : Model -> Html Msg
@@ -210,6 +219,7 @@ view model =
         div []
             [ h1 [ Style.headingStyles ] [ text ("Elm Chess") ]
             , text (model.message)
+            , button [ onClick (SendMessage (encodeMessage "move" "bar")) ] [ text ("Send Move") ]
             , h2 [ Style.turnLineStyles ]
                 [ turnLine ]
             , board
@@ -228,7 +238,7 @@ view model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    WebSocket.listen echoServer NewMessage
+    socketInit
 
 
 main =

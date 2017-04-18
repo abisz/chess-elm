@@ -50,3 +50,8 @@ type Msg
     | RenderBoard String
     | NewMessage String
     | SendMessage String
+
+
+type SocketMessage
+    = Error String
+    | NewConnection

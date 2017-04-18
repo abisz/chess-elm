@@ -8,6 +8,10 @@ io.on('connection', (socket) => {
   io.emit('new connection', {
     id: socket.id,
   });
+
+  socket.on('move', (data) => {
+    console.log('socket move', data);
+  });
 });
 
 server.listen(3000, () => {
