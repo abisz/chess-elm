@@ -1,4 +1,4 @@
-module Converter exposing (boardToString)
+module Converter exposing (boardToString, fieldString)
 
 import Types exposing (..)
 import Matrix exposing (..)
@@ -117,7 +117,7 @@ fieldString field =
         col =
             colString (Matrix.col field.loc)
     in
-        fig ++ row ++ col
+        fig ++ row ++ col ++ ";"
 
 
 boardToString : Matrix Field -> String
@@ -130,6 +130,6 @@ boardToString board =
                         string
 
                     Just figure ->
-                        string ++ (fieldString f) ++ ";"
+                        string ++ (fieldString f)
             )
             ""

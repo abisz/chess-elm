@@ -42,6 +42,7 @@ type alias Model =
     , turn : Player
     , checkMate : Bool
     , message : String
+    , solo : Bool
     }
 
 

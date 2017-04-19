@@ -54,8 +54,26 @@ changeTurnPlayer player =
         Black
 
 
-makeMove : Model -> Field -> Model
+makeMove : Model -> Field -> ( Model, Cmd Msg )
 makeMove model targetField =
+    if model.solo then
+        ( makeMoveSolo model targetField, Cmd.none )
+    else
+        makeMoveMulti model targetField
+
+
+makeMoveMulti : Model -> Field -> ( Model, Cmd Msg )
+makeMoveMulti model targetField =
+    case model.selected of
+        None ->
+            ( model, Cmd.none )
+
+        Active field ->
+            ( model, sendMove field targetField )
+
+
+makeMoveSolo : Model -> Field -> Model
+makeMoveSolo model targetField =
     let
         legitMove =
             isMoveLegit model.board model.selected targetField
@@ -153,7 +171,7 @@ makeMove model targetField =
             model
 
 
-clickField : Model -> Field -> Model
+clickField : Model -> Field -> ( Model, Cmd Msg )
 clickField model clickedField =
     let
         legitSelection =
@@ -185,9 +203,9 @@ clickField model clickedField =
                                     figure.color == figurePlayer.color
     in
         if model.checkMate then
-            model
+            ( model, Cmd.none )
         else if legitSelection then
-            selectField model clickedField
+            ( selectField model clickedField, Cmd.none )
         else
             makeMove model clickedField
 
@@ -213,6 +231,7 @@ init =
       , turn = White
       , checkMate = False
       , message = ""
+      , solo = False
       }
     , initConnection
     )
@@ -222,7 +241,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ClickField field ->
-            ( clickField model field, Cmd.none )
+            clickField model field
 
         RenderBoard string ->
             ( { model | board = (boardFromString (String.trim string)), selected = None }, Cmd.none )

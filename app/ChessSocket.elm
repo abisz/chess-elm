@@ -3,6 +3,7 @@ module ChessSocket exposing (..)
 import Types exposing (..)
 import Regex exposing (..)
 import WebSocket
+import Converter exposing (fieldString)
 
 
 echoServer : String
@@ -33,6 +34,17 @@ initConnection =
 sendMessage : String -> Cmd Msg
 sendMessage message =
     WebSocket.send echoServer message
+
+
+sendMove : Field -> Field -> Cmd Msg
+sendMove selectedField targetField =
+    sendMessage
+        (encodeMessage
+            "move"
+            ((fieldString selectedField)
+                ++ (fieldString targetField)
+            )
+        )
 
 
 decodeMessage : String -> SocketMessage
