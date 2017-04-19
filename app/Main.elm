@@ -8,7 +8,7 @@ import Style
 import BoardView exposing (drawBoard)
 import Types exposing (..)
 import Move exposing (isMoveLegit, isCheckMate, isCastlingMove, castlingPosition)
-import Converter exposing (boardToString, moveToSANString)
+import Converter exposing (boardToString)
 import BoardGenerator exposing (startBoard, boardFromString)
 import ChessSocket exposing (..)
 
@@ -216,15 +216,26 @@ clickField model clickedField =
 newMessage : Model -> String -> Model
 newMessage model string =
     let
+        messageType =
+            (decodeMessage string)
+
         message =
-            case (decodeMessage string) of
+            case messageType of
                 Error string ->
                     "Error: " ++ string
 
                 NewConnection ->
                     "New Connection"
+
+                _ ->
+                    ""
     in
-        { model | message = message }
+        case messageType of
+            Update fen ->
+                socketUpdate model fen
+
+            _ ->
+                { model | message = message }
 
 
 init : ( Model, Cmd Msg )
@@ -290,7 +301,6 @@ view model =
         div []
             [ h1 [ Style.headingStyles ] [ text ("Elm Chess") ]
             , text (model.message)
-            , button [ onClick (SendMessage (encodeMessage "move" "bar")) ] [ text ("Send Move") ]
             , h2 [ Style.turnLineStyles ]
                 [ turnLine ]
             , board

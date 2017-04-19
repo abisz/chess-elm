@@ -3,8 +3,9 @@ module ChessSocket exposing (..)
 import Types exposing (..)
 import Regex exposing (..)
 import WebSocket
-import Converter exposing (moveToSANString)
+import Converter exposing (locationString)
 import Matrix exposing (..)
+import BoardGenerator exposing (boardFromFen)
 
 
 echoServer : String
@@ -15,6 +16,11 @@ echoServer =
 messageRegex : Regex
 messageRegex =
     regex "\"(.*)\",{(.*)}"
+
+
+fenRegex : Regex
+fenRegex =
+    regex "^update\"fen\":\"(.+)\"$"
 
 
 encodeMessage : String -> String -> String
@@ -42,8 +48,78 @@ sendMove board selectedField targetField =
     sendMessage
         (encodeMessage
             "move"
-            (moveToSANString board selectedField targetField)
+            ((locationString selectedField.loc) ++ (locationString targetField.loc))
         )
+
+
+socketUpdate : Model -> String -> Model
+socketUpdate model fenRaw =
+    let
+        fenString =
+            unwrapFEN fenRaw
+
+        fenParts =
+            String.split " " fenString
+
+        nextPlayerString =
+            case
+                (List.head <|
+                    List.drop 1 fenParts
+                )
+            of
+                Nothing ->
+                    "b"
+
+                Just playerString ->
+                    playerString
+
+        nextPlayer =
+            if nextPlayerString == "b" then
+                Black
+            else
+                White
+
+        boardString =
+            case List.head fenParts of
+                Nothing ->
+                    ""
+
+                Just string ->
+                    string
+    in
+        { model | message = fenString, turn = nextPlayer, selected = Nothing, board = (boardFromFen boardString) }
+
+
+unwrapFEN : String -> String
+unwrapFEN raw =
+    let
+        matches =
+            find All fenRegex raw
+
+        fen =
+            List.foldl
+                (\match fen ->
+                    decodeSubmatchFEN match
+                )
+                ""
+                matches
+    in
+        fen
+
+
+decodeSubmatchFEN : Match -> String
+decodeSubmatchFEN match =
+    List.foldl
+        (\submatch result ->
+            case submatch of
+                Nothing ->
+                    result
+
+                Just string ->
+                    result ++ string
+        )
+        ""
+        match.submatches
 
 
 decodeMessage : String -> SocketMessage
@@ -117,6 +193,21 @@ decodeSubmatches submatches =
             case messageType of
                 "new connection" ->
                     NewConnection
+
+                "update" ->
+                    Update
+                        (List.foldl
+                            (\sm string ->
+                                case sm of
+                                    Nothing ->
+                                        string
+
+                                    Just text ->
+                                        string ++ text
+                            )
+                            ""
+                            submatches
+                        )
 
                 _ ->
                     Error "Messagetype not known"

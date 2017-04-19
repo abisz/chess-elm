@@ -1,4 +1,4 @@
-module BoardGenerator exposing (startBoard, getFieldColor, boardFromString, fieldFromString)
+module BoardGenerator exposing (startBoard, getFieldColor, boardFromString, fieldFromString, boardFromFen)
 
 import Types exposing (..)
 import Matrix exposing (..)
@@ -17,6 +17,78 @@ getFieldColor loc =
 startBoard : Matrix Field
 startBoard =
     boardFromString "bra8;bnb8;bbc8;bqd8;bke8;bbf8;bng8;brh8;bpa7;bpb7;bpc7;bpd7;bpe7;bpf7;bpg7;bph7;wpa2;wpb2;wpc2;wpd2;wpe2;wpf2;wpg2;wph2;wra1;wnb1;wbc1;wqd1;wke1;wbf1;wng1;wrh1;"
+
+
+boardFromFen : String -> Matrix Field
+boardFromFen string =
+    let
+        rowStrings =
+            String.split "/" string
+    in
+        square 8
+            (\l ->
+                let
+                    col =
+                        Matrix.col l
+
+                    row =
+                        Matrix.row l
+
+                    rowString =
+                        case
+                            (List.drop row rowStrings
+                                |> List.head
+                            )
+                        of
+                            Nothing ->
+                                "8"
+
+                            Just string ->
+                                string
+
+                    rowList =
+                        List.foldl
+                            (\c list ->
+                                case String.toInt c of
+                                    Err message ->
+                                        list ++ [ c ]
+
+                                    Ok value ->
+                                        list ++ (List.repeat value "0")
+                            )
+                            []
+                            (String.split "" rowString)
+
+                    figure =
+                        case
+                            (List.drop col rowList
+                                |> List.head
+                            )
+                        of
+                            Nothing ->
+                                Nothing
+
+                            Just char ->
+                                case char of
+                                    "0" ->
+                                        Nothing
+
+                                    _ ->
+                                        Just
+                                            { figure = stringToFigure (String.toLower char)
+                                            , color = characterToPlayer char
+                                            }
+                in
+                    { loc = l, color = (getFieldColor l), figure = figure }
+            )
+
+
+characterToPlayer : String -> Player
+characterToPlayer char =
+    if char == String.toLower char then
+        Black
+    else
+        White
 
 
 boardFromString : String -> Matrix Field

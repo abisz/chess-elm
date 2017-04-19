@@ -51,6 +51,7 @@ type Msg
 type SocketMessage
     = Error String
     | NewConnection
+    | Update String
 
 
 type CastlingPosition

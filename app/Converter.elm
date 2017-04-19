@@ -1,4 +1,4 @@
-module Converter exposing (boardToString, moveToSANString)
+module Converter exposing (boardToString, locationString)
 
 import Types exposing (..)
 import Matrix exposing (..)
@@ -151,7 +151,23 @@ boardToString board =
 
 moveToSANString : Matrix Field -> Field -> Field -> String
 moveToSANString board selectedField targetField =
+    -- Todo: Refactor to FEN
+    -- https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
     let
+        player =
+            case selectedField.figure of
+                Nothing ->
+                    White
+
+                Just figure ->
+                    figure.color
+
+        playerCase =
+            if player == White then
+                String.toUpper
+            else
+                String.toLower
+
         figure =
             case selectedField.figure of
                 Nothing ->
@@ -168,4 +184,4 @@ moveToSANString board selectedField targetField =
         field =
             locationString targetField.loc
     in
-        figure ++ field
+        (playerCase figure) ++ field

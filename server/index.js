@@ -4,8 +4,6 @@ const io = require('socket.io')(server);
 const Chess = require('chess.js').Chess;
 const chess = new Chess();
 
-chess.move('e4');
-
 console.log(chess.ascii());
 
 
@@ -16,8 +14,25 @@ io.on('connection', (socket) => {
     id: socket.id,
   });
 
-  socket.on('move', (data) => {
-    console.log('socket move', data);
+  socket.on('move', (move) => {
+    const from = move.slice(0, 2);
+    const to = move.slice(2, 4);
+
+    console.log('Attempting Move:');
+    console.log('from:', from);
+    console.log('to:', to);
+
+    console.log({ from, to });
+
+    if (chess.move({ from, to })) {
+      console.log(chess.ascii());
+
+      io.emit('update', {
+        fen: chess.fen()
+      });
+    } else {
+      console.log('move is not legal');
+    }
   });
 });
 
