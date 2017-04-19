@@ -55,20 +55,20 @@ drawFigure field =
                         "♔"
 
 
-fieldIsSelected : Field -> Selection -> Bool
+fieldIsSelected : Field -> Maybe Field -> Bool
 fieldIsSelected field selection =
     case selection of
-        None ->
+        Nothing ->
             False
 
-        Active f ->
+        Just f ->
             if f.loc == field.loc then
                 True
             else
                 False
 
 
-drawBoard : Matrix Field -> Selection -> Html Msg
+drawBoard : Matrix Field -> Maybe Field -> Html Msg
 drawBoard board selection =
     Matrix.map
         (\field ->

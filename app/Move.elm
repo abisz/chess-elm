@@ -84,15 +84,15 @@ moveIsPossible board selectedField targetField figure =
             isQueenMove board selectedField targetField
 
 
-isMoveLegit : Matrix Field -> Selection -> Field -> Bool
+isMoveLegit : Matrix Field -> Maybe Field -> Field -> Bool
 isMoveLegit board selected targetField =
     let
         updatedBoard =
             case selected of
-                None ->
+                Nothing ->
                     board
 
-                Active playerField ->
+                Just playerField ->
                     Matrix.map
                         (\f ->
                             if f.loc == targetField.loc then
@@ -105,10 +105,10 @@ isMoveLegit board selected targetField =
                         board
     in
         case selected of
-            None ->
+            Nothing ->
                 False
 
-            Active selectedField ->
+            Just selectedField ->
                 case selectedField.figure of
                     Nothing ->
                         False

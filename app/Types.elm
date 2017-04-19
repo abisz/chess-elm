@@ -31,14 +31,9 @@ type alias Field =
     }
 
 
-type Selection
-    = None
-    | Active Field
-
-
 type alias Model =
     { board : Matrix Field
-    , selected : Selection
+    , selected : Maybe Field
     , turn : Player
     , checkMate : Bool
     , message : String

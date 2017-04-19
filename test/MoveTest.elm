@@ -390,7 +390,7 @@ testMove boardString selectedLocation targetLocation chessFigure player =
                     , figure = Nothing
                     }
     in
-        isMoveLegit testBoard (Active selectedField) targetField
+        isMoveLegit testBoard (Just selectedField) targetField
 
 
 testCastlingPosition : String -> Location -> CastlingPosition

@@ -13,13 +13,13 @@ import BoardGenerator exposing (startBoard, boardFromString)
 import ChessSocket exposing (..)
 
 
-fieldAlreadySelected : Selection -> Field -> Bool
+fieldAlreadySelected : Maybe Field -> Field -> Bool
 fieldAlreadySelected selected field =
     case selected of
-        None ->
+        Nothing ->
             False
 
-        Active f ->
+        Just f ->
             if f.loc == field.loc then
                 True
             else
@@ -41,9 +41,9 @@ selectField model clickedField =
         if noFigure then
             model
         else if alreadySelected then
-            { model | selected = None }
+            { model | selected = Nothing }
         else
-            { model | selected = (Active clickedField) }
+            { model | selected = (Just clickedField) }
 
 
 changeTurnPlayer : Player -> Player
@@ -65,10 +65,10 @@ makeMove model targetField =
 makeMoveMulti : Model -> Field -> ( Model, Cmd Msg )
 makeMoveMulti model targetField =
     case model.selected of
-        None ->
+        Nothing ->
             ( model, Cmd.none )
 
-        Active field ->
+        Just field ->
             ( model, sendMove field targetField )
 
 
@@ -80,10 +80,10 @@ makeMoveSolo model targetField =
 
         isCastling =
             case model.selected of
-                None ->
+                Nothing ->
                     False
 
-                Active field ->
+                Just field ->
                     isCastlingMove model.board field targetField
 
         castlingPos =
@@ -122,10 +122,10 @@ makeMoveSolo model targetField =
 
         updatedBoard =
             case model.selected of
-                None ->
+                Nothing ->
                     model.board
 
-                Active playerField ->
+                Just playerField ->
                     Matrix.map
                         (\f ->
                             if f.loc == targetField.loc then
@@ -149,15 +149,15 @@ makeMoveSolo model targetField =
 
         changeTurn =
             case model.selected of
-                None ->
+                Nothing ->
                     False
 
-                Active field ->
+                Just field ->
                     True
     in
         if legitMove then
             { model
-                | selected = None
+                | selected = Nothing
                 , board = updatedBoard
                 , checkMate = checkMate
                 , turn =
@@ -177,7 +177,7 @@ clickField model clickedField =
         legitSelection =
             case model.selected of
                 -- pick up
-                None ->
+                Nothing ->
                     case clickedField.figure of
                         Nothing ->
                             False
@@ -189,7 +189,7 @@ clickField model clickedField =
                                 False
 
                 -- put down
-                Active field ->
+                Just field ->
                     case clickedField.figure of
                         Nothing ->
                             False
@@ -227,7 +227,7 @@ newMessage model string =
 init : ( Model, Cmd Msg )
 init =
     ( { board = startBoard
-      , selected = None
+      , selected = Nothing
       , turn = White
       , checkMate = False
       , message = ""
@@ -244,7 +244,7 @@ update msg model =
             clickField model field
 
         RenderBoard string ->
-            ( { model | board = (boardFromString (String.trim string)), selected = None }, Cmd.none )
+            ( { model | board = (boardFromString (String.trim string)), selected = Nothing }, Cmd.none )
 
         NewMessage string ->
             ( newMessage model string, Cmd.none )
