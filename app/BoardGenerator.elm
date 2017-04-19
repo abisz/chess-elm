@@ -16,7 +16,7 @@ getFieldColor loc =
 
 startBoard : Matrix Field
 startBoard =
-    boardFromString "br8a;bn8b;bb8c;bq8d;bk8e;bb8f;bn8g;br8h;bp7a;bp7b;bp7c;bp7d;bp7e;bp7f;bp7g;bp7h;wp2a;wp2b;wp2c;wp2d;wp2e;wp2f;wp2g;wp2h;wr1a;wn1b;wb1c;wq1d;wk1e;wb1f;wn1g;wr1h;"
+    boardFromString "bra8;bnb8;bbc8;bqd8;bke8;bbf8;bng8;brh8;bpa7;bpb7;bpc7;bpd7;bpe7;bpf7;bpg7;bph7;wpa2;wpb2;wpc2;wpd2;wpe2;wpf2;wpg2;wph2;wra1;wnb1;wbc1;wqd1;wke1;wbf1;wng1;wrh1;"
 
 
 boardFromString : String -> Matrix Field
@@ -61,23 +61,23 @@ boardFromString string =
 fieldFromString : String -> Maybe Field
 fieldFromString string =
     let
-        rowString =
-            String.slice 2 3 string
-
-        validRow =
-            isValidRowString rowString
-
-        row =
-            stringToRow rowString
-
         colString =
-            String.slice 3 4 string
+            String.slice 2 3 string
 
         validCol =
             isValidColString colString
 
         col =
             stringToCol colString
+
+        rowString =
+            String.slice 3 4 string
+
+        validRow =
+            isValidRowString rowString
+
+        row =
+            stringToRow rowString
 
         location =
             (loc row col)

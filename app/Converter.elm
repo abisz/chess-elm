@@ -105,6 +105,18 @@ figureString figure =
         color ++ fig
 
 
+locationString : Location -> String
+locationString loc =
+    let
+        col =
+            colString (Matrix.col loc)
+
+        row =
+            rowString (Matrix.row loc)
+    in
+        col ++ row
+
+
 fieldString : Field -> String
 fieldString field =
     let
@@ -116,13 +128,10 @@ fieldString field =
                 Just figure ->
                     figureString figure
 
-        row =
-            rowString (Matrix.row field.loc)
-
-        col =
-            colString (Matrix.col field.loc)
+        location =
+            locationString field.loc
     in
-        fig ++ row ++ col ++ ";"
+        fig ++ location ++ ";"
 
 
 boardToString : Matrix Field -> String
@@ -149,6 +158,14 @@ moveToSANString board selectedField targetField =
                     ""
 
                 Just figure ->
-                    chessFigureString figure.figure
+                    case figure.figure of
+                        Pawn ->
+                            ""
+
+                        _ ->
+                            chessFigureString figure.figure
+
+        field =
+            locationString targetField.loc
     in
-        figure
+        figure ++ field
