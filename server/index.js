@@ -1,6 +1,13 @@
 const app = require('express')();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
+const Chess = require('chess.js').Chess;
+const chess = new Chess();
+
+chess.move('e4');
+
+console.log(chess.ascii());
+
 
 io.on('connection', (socket) => {
   console.log(`new connection: ${socket.id}`);

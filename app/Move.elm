@@ -57,8 +57,8 @@ isCheckMate board =
             boardToString board
     in
         not
-            (String.contains "wK" boardString
-                && String.contains "bK" boardString
+            (String.contains "wk" boardString
+                && String.contains "bk" boardString
             )
 
 
@@ -134,6 +134,8 @@ isMoveLegit board selected targetField =
 
 isPawnMove : Matrix Field -> Field -> Field -> Player -> Bool
 isPawnMove board selectedField targetField player =
+    -- Todo: En passant
+    -- https://en.wikipedia.org/wiki/En_passant
     let
         xDiff =
             (Matrix.col targetField.loc) - (Matrix.col selectedField.loc)

@@ -8,7 +8,7 @@ import Style
 import BoardView exposing (drawBoard)
 import Types exposing (..)
 import Move exposing (isMoveLegit, isCheckMate, isCastlingMove, castlingPosition)
-import Converter exposing (boardToString)
+import Converter exposing (boardToString, moveToSANString)
 import BoardGenerator exposing (startBoard, boardFromString)
 import ChessSocket exposing (..)
 
@@ -69,11 +69,14 @@ makeMoveMulti model targetField =
             ( model, Cmd.none )
 
         Just field ->
-            ( model, sendMove field targetField )
+            ( model, sendMove model.board field targetField )
 
 
 makeMoveSolo : Model -> Field -> Model
 makeMoveSolo model targetField =
+    -- Todo: Fifty-Move Rule
+    -- https://en.wikipedia.org/wiki/Fifty-move_rule
+    -- Todo: Pawn Promotion
     let
         legitMove =
             isMoveLegit model.board model.selected targetField

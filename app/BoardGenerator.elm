@@ -16,7 +16,7 @@ getFieldColor loc =
 
 startBoard : Matrix Field
 startBoard =
-    boardFromString "br8a;bk8b;bb8c;bq8d;bK8e;bb8f;bk8g;br8h;bp7a;bp7b;bp7c;bp7d;bp7e;bp7f;bp7g;bp7h;wp2a;wp2b;wp2c;wp2d;wp2e;wp2f;wp2g;wp2h;wr1a;wk1b;wb1c;wq1d;wK1e;wb1f;wk1g;wr1h;"
+    boardFromString "br8a;bn8b;bb8c;bq8d;bk8e;bb8f;bn8g;br8h;bp7a;bp7b;bp7c;bp7d;bp7e;bp7f;bp7g;bp7h;wp2a;wp2b;wp2c;wp2d;wp2e;wp2f;wp2g;wp2h;wr1a;wn1b;wb1c;wq1d;wk1e;wb1f;wn1g;wr1h;"
 
 
 boardFromString : String -> Matrix Field
@@ -138,7 +138,7 @@ isValidPlayerString string =
 
 isValidFigureString : String -> Bool
 isValidFigureString string =
-    if List.member string [ "p", "k", "r", "b", "q", "K" ] then
+    if List.member string [ "p", "n", "r", "b", "q", "k" ] then
         True
     else
         False
@@ -150,7 +150,7 @@ stringToFigure string =
         "p" ->
             Pawn
 
-        "k" ->
+        "n" ->
             Knight
 
         "b" ->
@@ -162,7 +162,7 @@ stringToFigure string =
         "q" ->
             Queen
 
-        "K" ->
+        "k" ->
             King
 
         _ ->

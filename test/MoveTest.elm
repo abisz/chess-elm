@@ -30,19 +30,19 @@ castlingPositionTest =
         [ test "should return TopLeft" <|
             \() ->
                 Expect.equal TopLeft <|
-                    testCastlingPosition "br8a;bK8e;" (loc 0 2)
+                    testCastlingPosition "br8a;bk8e;" (loc 0 2)
         , test "should return TopRight" <|
             \() ->
                 Expect.equal TopRight <|
-                    testCastlingPosition "bK8e;br8h;" (loc 0 6)
+                    testCastlingPosition "bk8e;br8h;" (loc 0 6)
         , test "should return BottomLeft" <|
             \() ->
                 Expect.equal BottomLeft <|
-                    testCastlingPosition "wr1a;wK1e;" (loc 7 2)
+                    testCastlingPosition "wr1a;wk1e;" (loc 7 2)
         , test "should return BottomRight" <|
             \() ->
                 Expect.equal BottomRight <|
-                    testCastlingPosition "wK1e;wr1h;" (loc 7 6)
+                    testCastlingPosition "wk1e;wr1h;" (loc 7 6)
         ]
 
 
@@ -52,39 +52,39 @@ castlingTest =
         [ test "Left White Castling works" <|
             \() ->
                 Expect.equal True <|
-                    testMove "wr1a;wK1e;" (loc 7 4) (loc 7 2) King White
+                    testMove "wr1a;wk1e;" (loc 7 4) (loc 7 2) King White
         , test "Left White Castling not allowed" <|
             \() ->
                 Expect.equal False <|
-                    testMove "wK1e;" (loc 7 4) (loc 7 2) King White
+                    testMove "wk1e;" (loc 7 4) (loc 7 2) King White
         , test "Not Allowed if fields are not empty" <|
             \() ->
                 Expect.equal False <|
-                    testMove "wK1e;wp1c;wr1a;" (loc 7 4) (loc 7 2) King White
+                    testMove "wk1e;wp1c;wr1a;" (loc 7 4) (loc 7 2) King White
         , test "Only possible from start position" <|
             \() ->
                 Expect.equal False <|
-                    testMove "wr1a;wK3e;" (loc 5 4) (loc 5 2) King White
+                    testMove "wr1a;wk3e;" (loc 5 4) (loc 5 2) King White
         , test "Not possible if King is in Check" <|
             \() ->
                 Expect.equal False <|
-                    testMove "wr1a;wK1e;bb4b;" (loc 7 4) (loc 7 2) King White
+                    testMove "wr1a;wk1e;bb4b;" (loc 7 4) (loc 7 2) King White
         , test "Right Black Castling works" <|
             \() ->
                 Expect.equal True <|
-                    testMove "bK8e;br8h;" (loc 0 4) (loc 0 6) King Black
+                    testMove "bk8e;br8h;" (loc 0 4) (loc 0 6) King Black
         , test "Left Black Castling not allowed if there is a Figure in betweend" <|
             \() ->
                 Expect.equal False <|
-                    testMove "bK8e;br8a;bb8b;" (loc 0 4) (loc 0 2) King Black
+                    testMove "bk8e;br8a;bb8b;" (loc 0 4) (loc 0 2) King Black
         , test "Right Black Castling not allowed if there is a Figure in between" <|
             \() ->
                 Expect.equal False <|
-                    testMove "bK8e;bb8f;br8h;" (loc 0 4) (loc 0 6) King Black
+                    testMove "bk8e;bb8f;br8h;" (loc 0 4) (loc 0 6) King Black
         , test "May not move thorugh attacked field" <|
             \() ->
                 Expect.equal False <|
-                    testMove "br5d;wr1a;wK1e;" (loc 7 4) (loc 7 2) King White
+                    testMove "br5d;wr1a;wk1e;" (loc 7 4) (loc 7 2) King White
         ]
 
 
@@ -94,19 +94,19 @@ checkTest =
         [ test "Should be Check" <|
             \() ->
                 Expect.equal True <|
-                    isCheck (boardFromString "wK1a;bb8h;") White
+                    isCheck (boardFromString "wk1a;bb8h;") White
         , test "Shouldn't be Check" <|
             \() ->
                 Expect.equal False <|
-                    isCheck (boardFromString "bK4g;wp2d;") Black
+                    isCheck (boardFromString "bk4g;wp2d;") Black
         , test "Should be Check" <|
             \() ->
                 Expect.equal True <|
-                    isCheck (boardFromString "bb8a;wk5g;bK2a;wK1h;") White
+                    isCheck (boardFromString "bb8a;wn5g;bk2a;wk1h;") White
         , test "Shouldn't be Check" <|
             \() ->
                 Expect.equal False <|
-                    isCheck (boardFromString "bb8a;wk5g;bK2a;wK2h;") White
+                    isCheck (boardFromString "bb8a;wn5g;bk2a;wk2h;") White
         ]
 
 
@@ -116,11 +116,11 @@ checkMateTest =
         [ test "Should be Check Mate" <|
             \() ->
                 Expect.equal True <|
-                    isCheckMate (boardFromString "wK1a;")
+                    isCheckMate (boardFromString "wk1a;")
         , test "Shouldn't be Check Mate" <|
             \() ->
                 Expect.equal False <|
-                    isCheckMate (boardFromString "bK2a;wK4d;")
+                    isCheckMate (boardFromString "bk2a;wk4d;")
         ]
 
 
@@ -143,7 +143,7 @@ pawnMoveTest =
             , test "Can't cause Check for itself" <|
                 \() ->
                     Expect.equal False <|
-                        testMove "wp4c;wK4b;br4d;" (loc 4 2) (loc 5 2) Pawn White
+                        testMove "wp4c;wk4b;br4d;" (loc 4 2) (loc 5 2) Pawn White
             ]
         , describe "Double Move"
             [ test "Possible for First Move" <|
@@ -191,28 +191,28 @@ knightMoveTest =
             [ test "Default Success" <|
                 \() ->
                     Expect.equal True <|
-                        testMove "bk5d;" (loc 3 3) (loc 2 1) Knight Black
+                        testMove "bn5d;" (loc 3 3) (loc 2 1) Knight Black
             , test "Default Failure" <|
                 \() ->
                     Expect.equal False <|
-                        testMove "bk5d;" (loc 3 3) (loc 3 4) Knight Black
+                        testMove "bn5d;" (loc 3 3) (loc 3 4) Knight Black
             , test "Can't cause Check for itself" <|
                 \() ->
                     Expect.equal False <|
-                        testMove "wk3f;wK1h;bb8a;bK1a;" (loc 5 5) (loc 3 6) Knight White
+                        testMove "wn3f;wk1h;bb8a;bk1a;" (loc 5 5) (loc 3 6) Knight White
             ]
         , test "Jump over Figure" <|
             \() ->
-                Expect.equal True <| testMove "bk5d;wp6d;wp6e;wp7d;" (loc 3 3) (loc 1 4) Knight Black
+                Expect.equal True <| testMove "bn5d;wp6d;wp6e;wp7d;" (loc 3 3) (loc 1 4) Knight Black
         , describe "Beat Figure"
             [ test "Different Color" <|
                 \() ->
                     Expect.equal True <|
-                        testMove "bk5d;wp4b;" (loc 3 3) (loc 4 1) Knight Black
+                        testMove "bn5d;wp4b;" (loc 3 3) (loc 4 1) Knight Black
             , test "Same Color" <|
                 \() ->
                     Expect.equal False <|
-                        testMove "bk5d;bp4f;" (loc 3 3) (loc 4 5) Knight Black
+                        testMove "bn5d;bp4f;" (loc 3 3) (loc 4 5) Knight Black
             ]
         ]
 
@@ -232,7 +232,7 @@ bishopMoveTest =
             , test "Can't cause Check for itself" <|
                 \() ->
                     Expect.equal False <|
-                        testMove "bb4b;bK4a;wk3c;" (loc 4 1) (loc 3 2) Bishop Black
+                        testMove "bb4b;bk4a;wn3c;" (loc 4 1) (loc 3 2) Bishop Black
             ]
         , test "Jump Over Figure" <|
             \() ->
@@ -242,7 +242,7 @@ bishopMoveTest =
             [ test "Different Color" <|
                 \() ->
                     Expect.equal True <|
-                        testMove "bb3d;wK5b;" (loc 5 3) (loc 3 1) Bishop Black
+                        testMove "bb3d;wk5b;" (loc 5 3) (loc 3 1) Bishop Black
             , test "Same Color" <|
                 \() ->
                     Expect.equal False <|
@@ -266,7 +266,7 @@ rookMoveTest =
             , test "Can't cause Check for itself" <|
                 \() ->
                     Expect.equal False <|
-                        testMove "wr1a;wK1e;bq5a;" (loc 7 0) (loc 5 0) Rook White
+                        testMove "wr1a;wk1e;bq5a;" (loc 7 0) (loc 5 0) Rook White
             ]
         , test "Jump Over Figure" <|
             \() ->
@@ -300,7 +300,7 @@ queenMoveTest =
             , test "Can't cause Check for itself" <|
                 \() ->
                     Expect.equal False <|
-                        testMove "bq5e;bK7g;wp6f;" (loc 3 4) (loc 2 3) Queen Black
+                        testMove "bq5e;bk7g;wp6f;" (loc 3 4) (loc 2 3) Queen Black
             ]
         , describe "Basic Bishop Move"
             [ test "Default Success" <|
@@ -314,7 +314,7 @@ queenMoveTest =
             , test "Can't cause Check for itself" <|
                 \() ->
                     Expect.equal False <|
-                        testMove "wq1d;wK1e;bk3f;" (loc 7 3) (loc 4 0) Queen White
+                        testMove "wq1d;wk1e;bn3f;" (loc 7 3) (loc 4 0) Queen White
             ]
         , test "Jump Over Figure" <|
             \() ->
@@ -328,7 +328,7 @@ queenMoveTest =
             , test "Same Color" <|
                 \() ->
                     Expect.equal False <|
-                        testMove "wq2g;wK5g;" (loc 6 6) (loc 3 6) Queen White
+                        testMove "wq2g;wk5g;" (loc 6 6) (loc 3 6) Queen White
             ]
         ]
 
@@ -340,25 +340,25 @@ kingMoveTest =
             [ test "Default Success" <|
                 \() ->
                     Expect.equal True <|
-                        testMove "wK1a;" (loc 7 0) (loc 7 1) King White
+                        testMove "wk1a;" (loc 7 0) (loc 7 1) King White
             , test "Default Failure" <|
                 \() ->
                     Expect.equal False <|
-                        testMove "bK4f;" (loc 4 5) (loc 1 3) King Black
+                        testMove "bk4f;" (loc 4 5) (loc 1 3) King Black
             , test "Can't cause Check for itself" <|
                 \() ->
                     Expect.equal False <|
-                        testMove "wK3d;bp5e;" (loc 5 3) (loc 4 3) King White
+                        testMove "wk3d;bp5e;" (loc 5 3) (loc 4 3) King White
             ]
         , describe "Beat Figure"
             [ test "Different Color" <|
                 \() ->
                     Expect.equal True <|
-                        testMove "bK5b;wp4a;" (loc 3 1) (loc 4 0) King Black
+                        testMove "bk5b;wp4a;" (loc 3 1) (loc 4 0) King Black
             , test "Same Color" <|
                 \() ->
                     Expect.equal False <|
-                        testMove "bK7f;bk7e;" (loc 1 5) (loc 1 4) King Black
+                        testMove "bk7f;bn7e;" (loc 1 5) (loc 1 4) King Black
             ]
         ]
 
@@ -397,7 +397,7 @@ testCastlingPosition : String -> Location -> CastlingPosition
 testCastlingPosition boardString targetLocation =
     let
         board =
-            boardFromString "br8a;bK8e;"
+            boardFromString "br8a;bk8e;"
 
         targetField =
             Field targetLocation (getFieldColor targetLocation) Nothing

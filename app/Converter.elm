@@ -1,4 +1,4 @@
-module Converter exposing (boardToString, fieldString)
+module Converter exposing (boardToString, moveToSANString)
 
 import Types exposing (..)
 import Matrix exposing (..)
@@ -66,6 +66,28 @@ rowString row =
             "_"
 
 
+chessFigureString : ChessFigure -> String
+chessFigureString figure =
+    case figure of
+        Pawn ->
+            "p"
+
+        Knight ->
+            "n"
+
+        Bishop ->
+            "b"
+
+        Rook ->
+            "r"
+
+        Queen ->
+            "q"
+
+        King ->
+            "k"
+
+
 figureString : Figure -> String
 figureString figure =
     let
@@ -78,24 +100,7 @@ figureString figure =
                     "w"
 
         fig =
-            case figure.figure of
-                Pawn ->
-                    "p"
-
-                Knight ->
-                    "k"
-
-                Bishop ->
-                    "b"
-
-                Rook ->
-                    "r"
-
-                Queen ->
-                    "q"
-
-                King ->
-                    "K"
+            chessFigureString figure.figure
     in
         color ++ fig
 
@@ -133,3 +138,17 @@ boardToString board =
                         string ++ (fieldString f)
             )
             ""
+
+
+moveToSANString : Matrix Field -> Field -> Field -> String
+moveToSANString board selectedField targetField =
+    let
+        figure =
+            case selectedField.figure of
+                Nothing ->
+                    ""
+
+                Just figure ->
+                    chessFigureString figure.figure
+    in
+        figure

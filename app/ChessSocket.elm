@@ -3,7 +3,8 @@ module ChessSocket exposing (..)
 import Types exposing (..)
 import Regex exposing (..)
 import WebSocket
-import Converter exposing (fieldString)
+import Converter exposing (moveToSANString)
+import Matrix exposing (..)
 
 
 echoServer : String
@@ -36,14 +37,12 @@ sendMessage message =
     WebSocket.send echoServer message
 
 
-sendMove : Field -> Field -> Cmd Msg
-sendMove selectedField targetField =
+sendMove : Matrix Field -> Field -> Field -> Cmd Msg
+sendMove board selectedField targetField =
     sendMessage
         (encodeMessage
             "move"
-            ((fieldString selectedField)
-                ++ (fieldString targetField)
-            )
+            (moveToSANString board selectedField targetField)
         )
 
 
