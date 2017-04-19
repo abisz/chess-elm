@@ -1,4 +1,4 @@
-module Move exposing (isMoveLegit, isCheckMate, isCheck)
+module Move exposing (isMoveLegit, isCheckMate, isCheck, isCastlingMove, castlingPosition)
 
 import Types exposing (..)
 import Matrix exposing (..)
@@ -119,7 +119,7 @@ isMoveLegit board selected targetField =
                                 ((moveIsPossible board selectedField targetField selectedFigure)
                                     || (selectedFigure.figure
                                             == King
-                                            && isCastlingMove board selectedField targetField selectedFigure.color
+                                            && (isCastlingMove board selectedField targetField)
                                        )
                                 )
                                     && (not (isCheck updatedBoard selectedFigure.color))
@@ -269,10 +269,18 @@ isQueenMove board selectedField targetField =
         || isRookMove board selectedField targetField
 
 
-isCastlingMove : Matrix Field -> Field -> Field -> Player -> Bool
-isCastlingMove board selectedField targetField player =
+isCastlingMove : Matrix Field -> Field -> Field -> Bool
+isCastlingMove board selectedField targetField =
     -- Todo: Castling Rights
     let
+        player =
+            case selectedField.figure of
+                Nothing ->
+                    White
+
+                Just figure ->
+                    figure.color
+
         leftRookLocation =
             if player == White then
                 (loc 7 0)
@@ -358,47 +366,60 @@ isCastlingMove board selectedField targetField player =
             (row targetField.loc) - (row selectedField.loc)
     in
         if
-            ((abs xDiff)
-                <= 1
-                && (abs yDiff)
-                <= 1
-                && not (xDiff == 0 && yDiff == 0)
-            )
-                -- Castling
-                || (yDiff
-                        == 0
-                        -- Startposition
-                        && ((player == White && (row selectedField.loc) == 7)
-                                || (player == Black && (row selectedField.loc) == 0)
-                           )
-                        -- Cannot be Check
-                        && (not (isCheck board player))
-                        && (-- Kingside
-                            (xDiff
-                                == -2
+            (yDiff
+                == 0
+                -- Startposition
+                && ((player == White && (row selectedField.loc) == 7)
+                        || (player == Black && (row selectedField.loc) == 0)
+                   )
+                -- Cannot be Check
+                && (not (isCheck board player))
+                && (-- Kingside
+                    (xDiff
+                        == -2
+                        -- Rook needs to be correct position
+                        && (hasSpecificFigure leftRookField player Rook)
+                        -- Fields in between need to be empty
+                        && leftCastlingFieldsEmpty
+                        -- Fields in between cannot be attacked
+                        && leftCastlingFieldsNotAttacked
+                    )
+                        || -- Queenside
+                           (xDiff
+                                == 2
                                 -- Rook needs to be correct position
-                                && (hasSpecificFigure leftRookField player Rook)
+                                && (hasSpecificFigure rightRookField player Rook)
                                 -- Fields in between need to be empty
-                                && leftCastlingFieldsEmpty
+                                && rightCastlingFieldsEmpty
                                 -- Fields in between cannot be attacked
-                                && leftCastlingFieldsNotAttacked
-                            )
-                                || -- Queenside
-                                   (xDiff
-                                        == 2
-                                        -- Rook needs to be correct position
-                                        && (hasSpecificFigure rightRookField player Rook)
-                                        -- Fields in between need to be empty
-                                        && rightCastlingFieldsEmpty
-                                        -- Fields in between cannot be attacked
-                                        && rightCastlingFieldsNotAttacked
-                                   )
+                                && rightCastlingFieldsNotAttacked
                            )
                    )
+            )
         then
             True
         else
             False
+
+
+castlingPosition : Matrix Field -> Field -> CastlingPosition
+castlingPosition board targetField =
+    let
+        row =
+            Matrix.row targetField.loc
+
+        col =
+            Matrix.col targetField.loc
+    in
+        if row == 0 then
+            if col == 2 then
+                TopLeft
+            else
+                TopRight
+        else if col == 2 then
+            BottomLeft
+        else
+            BottomRight
 
 
 

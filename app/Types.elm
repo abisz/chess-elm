@@ -55,3 +55,10 @@ type Msg
 type SocketMessage
     = Error String
     | NewConnection
+
+
+type CastlingPosition
+    = TopLeft
+    | TopRight
+    | BottomLeft
+    | BottomRight

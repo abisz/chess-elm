@@ -7,7 +7,7 @@ import Matrix exposing (..)
 import Style
 import BoardView exposing (drawBoard)
 import Types exposing (..)
-import Move exposing (isMoveLegit, isCheckMate)
+import Move exposing (isMoveLegit, isCheckMate, isCastlingMove, castlingPosition)
 import Converter exposing (boardToString)
 import BoardGenerator exposing (startBoard, boardFromString)
 import ChessSocket exposing (..)
@@ -60,6 +60,48 @@ makeMove model targetField =
         legitMove =
             isMoveLegit model.board model.selected targetField
 
+        isCastling =
+            case model.selected of
+                None ->
+                    False
+
+                Active field ->
+                    isCastlingMove model.board field targetField
+
+        castlingPos =
+            castlingPosition model.board targetField
+
+        rookCastlingStart =
+            case castlingPos of
+                TopLeft ->
+                    loc 0 0
+
+                TopRight ->
+                    loc 0 7
+
+                BottomLeft ->
+                    loc 7 0
+
+                BottomRight ->
+                    loc 7 7
+
+        rookCastlingTarget =
+            case castlingPos of
+                TopLeft ->
+                    loc 0 3
+
+                TopRight ->
+                    loc 0 5
+
+                BottomLeft ->
+                    loc 7 3
+
+                BottomRight ->
+                    loc 7 5
+
+        rook =
+            Figure Rook White
+
         updatedBoard =
             case model.selected of
                 None ->
@@ -72,6 +114,13 @@ makeMove model targetField =
                                 { f | figure = playerField.figure }
                             else if f.loc == playerField.loc then
                                 { f | figure = Nothing }
+                            else if isCastling then
+                                if f.loc == rookCastlingStart then
+                                    { f | figure = Nothing }
+                                else if f.loc == rookCastlingTarget then
+                                    { f | figure = Just rook }
+                                else
+                                    f
                             else
                                 f
                         )

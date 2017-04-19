@@ -3,7 +3,7 @@ module MoveTest exposing (allTests)
 import Test exposing (Test, describe, test)
 import Types exposing (..)
 import Matrix exposing (..)
-import Move exposing (isMoveLegit, isCheckMate, isCheck)
+import Move exposing (isMoveLegit, isCheckMate, isCheck, castlingPosition)
 import BoardGenerator exposing (getFieldColor, boardFromString, fieldFromString)
 import Expect
 
@@ -20,6 +20,29 @@ allTests =
         , checkMateTest
         , checkTest
         , castlingTest
+        , castlingPositionTest
+        ]
+
+
+castlingPositionTest : Test
+castlingPositionTest =
+    describe "Castling Position"
+        [ test "should return TopLeft" <|
+            \() ->
+                Expect.equal TopLeft <|
+                    testCastlingPosition "br8a;bK8e;" (loc 0 2)
+        , test "should return TopRight" <|
+            \() ->
+                Expect.equal TopRight <|
+                    testCastlingPosition "bK8e;br8h;" (loc 0 6)
+        , test "should return BottomLeft" <|
+            \() ->
+                Expect.equal BottomLeft <|
+                    testCastlingPosition "wr1a;wK1e;" (loc 7 2)
+        , test "should return BottomRight" <|
+            \() ->
+                Expect.equal BottomRight <|
+                    testCastlingPosition "wK1e;wr1h;" (loc 7 6)
         ]
 
 
@@ -368,3 +391,15 @@ testMove boardString selectedLocation targetLocation chessFigure player =
                     }
     in
         isMoveLegit testBoard (Active selectedField) targetField
+
+
+testCastlingPosition : String -> Location -> CastlingPosition
+testCastlingPosition boardString targetLocation =
+    let
+        board =
+            boardFromString "br8a;bK8e;"
+
+        targetField =
+            Field targetLocation (getFieldColor targetLocation) Nothing
+    in
+        castlingPosition board targetField
