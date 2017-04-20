@@ -91,7 +91,7 @@ modeButtonDeclarations =
 
 activeButtonDeclarations : List Declaration
 activeButtonDeclarations =
-    [ ("box-shadow", Multiple " " [Str "inset", Unit 0 NoUnit, Unit 0 NoUnit, Unit 5 Px, Col Color.black] )
+    [ ( "box-shadow", Multiple " " [ Str "inset", Unit 0 NoUnit, Unit 0 NoUnit, Unit 5 Px, Col Color.black ] )
     ]
 
 

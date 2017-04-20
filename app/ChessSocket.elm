@@ -52,6 +52,11 @@ sendMove board selectedField targetField =
         )
 
 
+sendUpdateRequest : Cmd Msg
+sendUpdateRequest =
+    WebSocket.send echoServer (encodeMessage "getBoard" "")
+
+
 socketUpdate : Model -> String -> Model
 socketUpdate model fenRaw =
     let
@@ -140,28 +145,10 @@ decodeMessage rawString =
             decodeMatches matches
 
 
-
---[\"new connection\",{\"id\":\"UA--Ww5XMyC7_E_TAAAA\"}]
---[{
---    match = "\"new connection\",{\"id\":\"UA--Ww5XMyC7_E_TAAAA\"}"
---    , submatches = [
---        Just "new connection"
---        ,Just "\"id\":\"UA--Ww5XMyC7_E_TAAAA\""
---    ]
---    , index = 1
---    , number = 1
---}]
-
-
 decodeMatches : List Match -> SocketMessage
 decodeMatches matches =
     List.foldl
         (\match matchType ->
-            --            case matchType of
-            --                Error errorMessage ->
-            --                    Error errorMessage
-            --
-            --                _ ->
             decodeSubmatches match.submatches
         )
         (Error "Decoding Matches")
@@ -211,50 +198,3 @@ decodeSubmatches submatches =
 
                 _ ->
                     Error "Messagetype not known"
-
-
-
---        Error "match error"
---    let
---        code =
---                String.left 2 string
---
---            json =
---                String.dropLeft 2 string
---
---            matches =
---                find All messageRegex json
---
---            messageType =
---                List.foldl (\m msgType ->
---                    let
---                        typeString =
---                            List.foldl (\subm submType->
---                                if not (String.isEmpty submType) then
---                                    case subm of
---                                        Nothing ->
---                                            submType
---                                        Just string ->
---                                            string
---                                else
---                                    submType
---                            ) "" m.submatches
---
---                    in
---                        case typeString of
---                            "new connection" ->
---                                NewConnection
---                            _ ->
---                                Error
---                ) Error matches
---
---            message =
---                case messageType of
---                    Error ->
---                        "Error"
---                    NewConnection ->
---                        "New Connection"
---        if code == "42" then
---            { model | message = message }
---        else
---            { model | message = "Not code 42: " ++ string }
