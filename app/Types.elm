@@ -37,8 +37,13 @@ type alias Model =
     , turn : Player
     , checkMate : Bool
     , message : String
-    , solo : Bool
+    , mode : GameMode
     }
+
+
+type GameMode
+    = Local
+    | Network
 
 
 type Msg
@@ -46,6 +51,7 @@ type Msg
     | RenderBoard String
     | NewMessage String
     | SendMessage String
+    | ChangeGameMode GameMode
 
 
 type SocketMessage

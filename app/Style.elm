@@ -72,6 +72,29 @@ basicAnyDeclarations =
     ]
 
 
+modeButtonContainerDeclarations : List Declaration
+modeButtonContainerDeclarations =
+    [ ( "text-align", Str "center" )
+    ]
+
+
+modeButtonDeclarations : List Declaration
+modeButtonDeclarations =
+    [ ( "background", Str "none" )
+    , ( "border", Str "none" )
+    , ( "border-radius", Unit 5 Px )
+    , ( "font-family", FontStack [ "sans-serif" ] )
+    , ( "font-size", Unit 0.8 Em )
+    , ( "padding", Multiple " " [ Unit 0.75 Em, Unit 1.5 Em ] )
+    ]
+
+
+activeButtonDeclarations : List Declaration
+activeButtonDeclarations =
+    [ ("box-shadow", Multiple " " [Str "inset", Unit 0 NoUnit, Unit 0 NoUnit, Unit 5 Px, Col Color.black] )
+    ]
+
+
 basicRuleset : List RuleSet
 basicRuleset =
     [ { selectors = [ Any ]
@@ -80,6 +103,18 @@ basicRuleset =
       }
     , { selectors = [ Class "field" ]
       , declarations = basicFieldDeclarations
+      , mediaQuery = Nothing
+      }
+    , { selectors = [ Class "btnModeContainer" ]
+      , declarations = modeButtonContainerDeclarations
+      , mediaQuery = Nothing
+      }
+    , { selectors = [ Class "btnMode" ]
+      , declarations = modeButtonDeclarations
+      , mediaQuery = Nothing
+      }
+    , { selectors = [ Class "active" ]
+      , declarations = activeButtonDeclarations
       , mediaQuery = Nothing
       }
     ]

@@ -56,14 +56,16 @@ changeTurnPlayer player =
 
 makeMove : Model -> Field -> ( Model, Cmd Msg )
 makeMove model targetField =
-    if model.solo then
-        ( makeMoveSolo model targetField, Cmd.none )
-    else
-        makeMoveMulti model targetField
+    case model.mode of
+        Local ->
+            ( makeMoveLocal model targetField, Cmd.none )
+
+        Network ->
+            makeMoveNetwork model targetField
 
 
-makeMoveMulti : Model -> Field -> ( Model, Cmd Msg )
-makeMoveMulti model targetField =
+makeMoveNetwork : Model -> Field -> ( Model, Cmd Msg )
+makeMoveNetwork model targetField =
     case model.selected of
         Nothing ->
             ( model, Cmd.none )
@@ -72,8 +74,8 @@ makeMoveMulti model targetField =
             ( model, sendMove model.board field targetField )
 
 
-makeMoveSolo : Model -> Field -> Model
-makeMoveSolo model targetField =
+makeMoveLocal : Model -> Field -> Model
+makeMoveLocal model targetField =
     -- Todo: Fifty-Move Rule
     -- https://en.wikipedia.org/wiki/Fifty-move_rule
     -- Todo: Pawn Promotion
@@ -232,7 +234,10 @@ newMessage model string =
     in
         case messageType of
             Update fen ->
-                socketUpdate model fen
+                if model.mode == Network then
+                    socketUpdate model fen
+                else
+                    { model | message = message }
 
             _ ->
                 { model | message = message }
@@ -245,7 +250,7 @@ init =
       , turn = White
       , checkMate = False
       , message = ""
-      , solo = False
+      , mode = Local
       }
     , initConnection
     )
@@ -265,6 +270,9 @@ update msg model =
 
         SendMessage string ->
             ( model, sendMessage string )
+
+        ChangeGameMode mode ->
+            ( { model | mode = mode }, Cmd.none )
 
 
 view : Model -> Html Msg
@@ -301,18 +309,42 @@ view model =
         div []
             [ h1 [ Style.headingStyles ] [ text ("Elm Chess") ]
             , text (model.message)
+            , div [ class "btnModeContainer" ]
+                [ h3 [] [ text ("Game Mode:") ]
+                , button
+                    [ onClick (ChangeGameMode Local)
+                    , class
+                        (if model.mode == Local then
+                            "active btnMode"
+                         else
+                            "inactive btnMode"
+                        )
+                    ]
+                    [ text ("Local") ]
+                , button
+                    [ onClick (ChangeGameMode Network)
+                    , class
+                        (if model.mode == Network then
+                            "active btnMode"
+                         else
+                            "inactive btnMode"
+                        )
+                    ]
+                    [ text ("Network") ]
+                ]
             , h2 [ Style.turnLineStyles ]
                 [ turnLine ]
             , board
-            , textarea
-                [ style
-                    [ ( "width", "400px" )
-                    , ( "height", "150px" )
-                    ]
-                , value boardString
-                , onInput RenderBoard
-                ]
-                []
+
+            --            , textarea
+            --                [ style
+            --                    [ ( "width", "400px" )
+            --                    , ( "height", "150px" )
+            --                    ]
+            --                , value boardString
+            --                , onInput RenderBoard
+            --                ]
+            --                []
             , Style.basicStyles
             ]
 
