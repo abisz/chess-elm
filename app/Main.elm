@@ -272,7 +272,14 @@ update msg model =
             ( model, sendMessage string )
 
         ChangeGameMode mode ->
-            ( { model | mode = mode }, Cmd.none )
+            let
+                cmd =
+                    if mode == Network then
+                        sendUpdateRequest
+                    else
+                        Cmd.none
+            in
+                ( { model | mode = mode }, cmd )
 
 
 view : Model -> Html Msg

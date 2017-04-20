@@ -34,6 +34,12 @@ io.on('connection', (socket) => {
       console.log('move is not legal');
     }
   });
+
+  socket.on('getBoard', () => {
+    socket.emit('update', {
+      fen: chess.fen()
+    });
+  });
 });
 
 server.listen(3000, () => {
