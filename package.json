@@ -7,7 +7,11 @@
     "type": "git"
   },
   "scripts": {
-    "start": "node ./server/index.js"
+    "start": "node ./server/index.js",
+    "build": "elm-make app/Main.elm --output=./dist/index.html",
+    "test": "elm-test ./test/TestRunner.elm",
+    "format": "elm-format . --yes",
+    "deploy": "gh-pages -d dist"
   },
   "author": "Simon Reinsperger <reinsperger.smn@gmail.com>",
   "license": "MIT",
@@ -15,5 +19,8 @@
     "chess.js": "^0.10.2",
     "express": "^4.15.2",
     "socket.io": "^1.7.3"
+  },
+  "devDependencies": {
+    "gh-pages": "^0.12.0"
   }
 }
