@@ -51,10 +51,6 @@ sendMove board selectedField targetField =
             ((locationString selectedField.loc) ++ (locationString targetField.loc))
         )
 
-sendUpdateRequest : Cmd Msg
-sendUpdateRequest =
-    WebSocket.send echoServer (encodeMessage "getBoard" "")
-
 
 sendUpdateRequest : Cmd Msg
 sendUpdateRequest =

@@ -1,4 +1,4 @@
-module Converter exposing (boardToString, locationString, boardToFen)
+module Converter exposing (boardToString, locationString, boardToFen, gameToFen)
 
 import Types exposing (..)
 import Matrix exposing (..)
@@ -239,6 +239,40 @@ boardToFen board =
             )
             ""
             rowStringList
+
+
+gameToFen : Matrix Field -> Player -> String
+gameToFen board player =
+    let
+        piecePlacement =
+            boardToFen board
+
+        playerString =
+            if player == White then
+                "w"
+            else
+                "b"
+
+        castlingString =
+            "KQkq"
+
+        enPassant =
+            "-"
+
+        halfMoves =
+            "0"
+
+        fullMoves =
+            "1"
+    in
+        String.join " "
+            [ piecePlacement
+            , playerString
+            , castlingString
+            , enPassant
+            , halfMoves
+            , fullMoves
+            ]
 
 
 moveToSANString : Matrix Field -> Field -> Field -> String

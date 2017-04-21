@@ -8,7 +8,7 @@ import Style
 import BoardView exposing (drawBoard)
 import Types exposing (..)
 import Move exposing (isMoveLegit, isCheckMate, isCastlingMove, castlingPosition)
-import Converter exposing (boardToString)
+import Converter exposing (boardToString, gameToFen)
 import BoardGenerator exposing (startBoard, boardFromString)
 import ChessSocket exposing (..)
 
@@ -315,7 +315,9 @@ view model =
     in
         div []
             [ h1 [ Style.headingStyles ] [ text ("Elm Chess") ]
-            , text (model.message)
+
+            --            , text (model.message)
+            , text (gameToFen model.board model.turn)
             , div [ class "btnModeContainer" ]
                 [ h3 [] [ text ("Game Mode:") ]
                 , button
