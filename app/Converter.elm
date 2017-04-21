@@ -1,4 +1,4 @@
-module Converter exposing (boardToString, locationString)
+module Converter exposing (boardToString, locationString, boardToFen)
 
 import Types exposing (..)
 import Matrix exposing (..)
@@ -117,8 +117,8 @@ locationString loc =
         col ++ row
 
 
-fieldString : Field -> String
-fieldString field =
+getFieldString : Field -> String
+getFieldString field =
     let
         fig =
             case field.figure of
@@ -144,9 +144,101 @@ boardToString board =
                         string
 
                     Just figure ->
-                        string ++ (fieldString f)
+                        string ++ (getFieldString f)
             )
             ""
+
+
+rowToFen : List Field -> String
+rowToFen row =
+    List.foldl
+        (\field rowString ->
+            let
+                hasFigure =
+                    case field.figure of
+                        Nothing ->
+                            False
+
+                        Just figure ->
+                            True
+
+                player =
+                    case field.figure of
+                        Nothing ->
+                            White
+
+                        Just figure ->
+                            figure.color
+
+                figureCase =
+                    if player == White then
+                        String.toUpper
+                    else
+                        String.toLower
+
+                fieldString =
+                    if hasFigure then
+                        figureCase
+                            (chessFigureString
+                                (case field.figure of
+                                    Nothing ->
+                                        Pawn
+
+                                    Just figure ->
+                                        figure.figure
+                                )
+                            )
+                    else
+                        "0"
+
+                lastCharacterInString =
+                    String.right 1 rowString
+
+                lastIsInt =
+                    case (String.toInt lastCharacterInString) of
+                        Ok value ->
+                            True
+
+                        Err message ->
+                            False
+
+                lastInt =
+                    case (String.toInt lastCharacterInString) of
+                        Ok value ->
+                            value
+
+                        Err message ->
+                            -1
+            in
+                if hasFigure then
+                    rowString ++ fieldString
+                else if lastIsInt then
+                    (String.dropRight 1 rowString) ++ (toString (lastInt + 1))
+                else
+                    rowString ++ "1"
+        )
+        ""
+        row
+
+
+boardToFen : Matrix Field -> String
+boardToFen board =
+    let
+        rowList =
+            Matrix.toList board
+
+        rowStringList =
+            List.map rowToFen rowList
+    in
+        List.foldl
+            (\row board ->
+                if String.isEmpty board then
+                    row
+                else
+                    board ++ "/" ++ row
+            )
+            ""
+            rowStringList
 
 
 moveToSANString : Matrix Field -> Field -> Field -> String

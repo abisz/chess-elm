@@ -5,6 +5,7 @@ import Json.Encode exposing (Value)
 import Test exposing (describe)
 import MoveTest
 import BoardGeneratorTest
+import ConverterTest
 
 
 main : TestProgram
@@ -13,6 +14,7 @@ main =
         describe "Test Suite"
             [ MoveTest.allTests
             , BoardGeneratorTest.allTests
+            , ConverterTest.allTests
             ]
 
 
