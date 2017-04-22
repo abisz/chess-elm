@@ -1,7 +1,8 @@
-module Converter exposing (boardToString, locationString, boardToFen, gameToFen)
+module Converter exposing (boardToString, locationString, boardToFen, gameToFen, fenToGame)
 
 import Types exposing (..)
 import Matrix exposing (..)
+import BoardGenerator exposing (boardFromFen)
 
 
 colString : Int -> String
@@ -241,14 +242,14 @@ boardToFen board =
             rowStringList
 
 
-gameToFen : Matrix Field -> Player -> String
-gameToFen board player =
+gameToFen : Model -> String
+gameToFen model =
     let
         piecePlacement =
-            boardToFen board
+            boardToFen model.board
 
         playerString =
-            if player == White then
+            if model.turn == White then
                 "w"
             else
                 "b"
@@ -273,6 +274,45 @@ gameToFen board player =
             , halfMoves
             , fullMoves
             ]
+
+
+fenToGame : String -> Model -> Model
+fenToGame fen model =
+    let
+        fenParts =
+            String.split " " fen
+
+        piecePlacement =
+            case (List.head fenParts) of
+                Nothing ->
+                    ""
+
+                Just boardString ->
+                    boardString
+
+        nextPlayerString =
+            case
+                (List.head <|
+                    List.drop 1 fenParts
+                )
+            of
+                Nothing ->
+                    "b"
+
+                Just playerString ->
+                    playerString
+
+        nextPlayer =
+            if nextPlayerString == "b" then
+                Black
+            else
+                White
+    in
+        { model
+            | board = (boardFromFen piecePlacement)
+            , turn = nextPlayer
+            , selected = Nothing
+        }
 
 
 moveToSANString : Matrix Field -> Field -> Field -> String

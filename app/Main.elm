@@ -8,7 +8,7 @@ import Style
 import BoardView exposing (drawBoard)
 import Types exposing (..)
 import Move exposing (isMoveLegit, isCheckMate, isCastlingMove, castlingPosition)
-import Converter exposing (boardToString, gameToFen)
+import Converter exposing (boardToString, gameToFen, fenToGame)
 import BoardGenerator exposing (startBoard, boardFromString)
 import ChessSocket exposing (..)
 
@@ -159,8 +159,8 @@ makeMoveLocal model targetField =
 
                 Just field ->
                     True
-    in
-        if legitMove then
+
+        newModel =
             { model
                 | selected = Nothing
                 , board = updatedBoard
@@ -172,6 +172,9 @@ makeMoveLocal model targetField =
                         model.turn
                     )
             }
+    in
+        if legitMove then
+            { newModel | localGame = (gameToFen newModel) }
         else
             model
 
@@ -243,9 +246,16 @@ newMessage model string =
                 { model | message = message }
 
 
+startPositionFen : String
+startPositionFen =
+    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+
+
 init : ( Model, Cmd Msg )
 init =
     ( { board = startBoard
+      , localGame = startPositionFen
+      , networkGame = startPositionFen
       , selected = Nothing
       , turn = White
       , checkMate = False
@@ -278,8 +288,16 @@ update msg model =
                         sendUpdateRequest
                     else
                         Cmd.none
+
+                newModel =
+                    case mode of
+                        Local ->
+                            fenToGame model.localGame model
+
+                        Network ->
+                            fenToGame model.networkGame model
             in
-                ( { model | mode = mode }, cmd )
+                ( { newModel | mode = mode }, cmd )
 
 
 view : Model -> Html Msg
@@ -317,7 +335,7 @@ view model =
             [ h1 [ Style.headingStyles ] [ text ("Elm Chess") ]
 
             --            , text (model.message)
-            , text (gameToFen model.board model.turn)
+            , text (gameToFen model)
             , div [ class "btnModeContainer" ]
                 [ h3 [] [ text ("Game Mode:") ]
                 , button

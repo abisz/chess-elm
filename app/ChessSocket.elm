@@ -3,7 +3,7 @@ module ChessSocket exposing (..)
 import Types exposing (..)
 import Regex exposing (..)
 import WebSocket
-import Converter exposing (locationString)
+import Converter exposing (locationString, fenToGame)
 import Matrix exposing (..)
 import BoardGenerator exposing (boardFromFen)
 
@@ -63,36 +63,13 @@ socketUpdate model fenRaw =
         fenString =
             unwrapFEN fenRaw
 
-        fenParts =
-            String.split " " fenString
-
-        nextPlayerString =
-            case
-                (List.head <|
-                    List.drop 1 fenParts
-                )
-            of
-                Nothing ->
-                    "b"
-
-                Just playerString ->
-                    playerString
-
-        nextPlayer =
-            if nextPlayerString == "b" then
-                Black
-            else
-                White
-
-        boardString =
-            case List.head fenParts of
-                Nothing ->
-                    ""
-
-                Just string ->
-                    string
+        newModel =
+            fenToGame fenString model
     in
-        { model | message = fenString, turn = nextPlayer, selected = Nothing, board = (boardFromFen boardString) }
+        { newModel
+            | message = fenString
+            , networkGame = fenString
+        }
 
 
 unwrapFEN : String -> String

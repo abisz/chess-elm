@@ -33,6 +33,8 @@ type alias Field =
 
 type alias Model =
     { board : Matrix Field
+    , localGame : String
+    , networkGame : String
     , selected : Maybe Field
     , turn : Player
     , checkMate : Bool
