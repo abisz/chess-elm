@@ -256,13 +256,16 @@ init =
     ( { board = startBoard
       , localGame = startPositionFen
       , networkGame = startPositionFen
+      , roomInput = ""
+      , room = ""
       , selected = Nothing
       , turn = White
       , checkMate = False
       , message = ""
       , mode = Local
       }
-    , initConnection
+      --    , initConnection
+    , Cmd.none
     )
 
 
@@ -273,7 +276,12 @@ update msg model =
             clickField model field
 
         RenderBoard string ->
-            ( { model | board = (boardFromString (String.trim string)), selected = Nothing }, Cmd.none )
+            ( { model
+                | board = (boardFromString (String.trim string))
+                , selected = Nothing
+              }
+            , Cmd.none
+            )
 
         NewMessage string ->
             ( newMessage model string, Cmd.none )
@@ -298,6 +306,21 @@ update msg model =
                             fenToGame model.networkGame model
             in
                 ( { newModel | mode = mode }, cmd )
+
+        RoomInput roomString ->
+            ( { model | roomInput = roomString }, Cmd.none )
+
+        ConnectRoom ->
+            ( model, connectToRoom model.roomInput )
+
+
+networkSettingsView : String -> Html Msg
+networkSettingsView roomName =
+    div [ Style.turnLineStyles ]
+        [ h2 [ Style.turnLineStyles ] [ text ("Room:" ++ roomName) ]
+        , input [ Style.turnLineStyles, onInput RoomInput ] []
+        , button [ onClick ConnectRoom ] [ text "Connect to Room" ]
+        ]
 
 
 view : Model -> Html Msg
@@ -333,11 +356,11 @@ view model =
     in
         div []
             [ h1 [ Style.headingStyles ] [ text ("Elm Chess") ]
+            , text (model.message)
 
-            --            , text (model.message)
-            , text (gameToFen model)
+            --            , text (gameToFen model)
             , div [ class "btnModeContainer" ]
-                [ h3 [] [ text ("Game Mode:") ]
+                [ h3 [] [ text "Game Mode:" ]
                 , button
                     [ onClick (ChangeGameMode Local)
                     , class
@@ -361,6 +384,11 @@ view model =
                 ]
             , h2 [ Style.turnLineStyles ]
                 [ turnLine ]
+            , (if model.mode == Network then
+                networkSettingsView model.room
+               else
+                div [] []
+              )
             , board
 
             --            , textarea

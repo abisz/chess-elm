@@ -33,9 +33,10 @@ socketInit =
     WebSocket.listen echoServer NewMessage
 
 
-initConnection : Cmd Msg
-initConnection =
-    WebSocket.send echoServer "connection"
+
+--initConnection : Cmd Msg
+--initConnection =
+--    WebSocket.send echoServer (encodeMessage "connection" "foo")
 
 
 sendMessage : String -> Cmd Msg
@@ -50,6 +51,11 @@ sendMove board selectedField targetField =
             "move"
             ((locationString selectedField.loc) ++ (locationString targetField.loc))
         )
+
+
+connectToRoom : String -> Cmd Msg
+connectToRoom room =
+    sendMessage (encodeMessage "connectToRoom" room)
 
 
 sendUpdateRequest : Cmd Msg

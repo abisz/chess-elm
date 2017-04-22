@@ -35,6 +35,8 @@ type alias Model =
     { board : Matrix Field
     , localGame : String
     , networkGame : String
+    , roomInput : String
+    , room : String
     , selected : Maybe Field
     , turn : Player
     , checkMate : Bool
@@ -54,6 +56,8 @@ type Msg
     | NewMessage String
     | SendMessage String
     | ChangeGameMode GameMode
+    | RoomInput String
+    | ConnectRoom
 
 
 type SocketMessage

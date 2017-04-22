@@ -11,7 +11,7 @@
     "build": "elm-make app/Main.elm --output=./dist/index.html",
     "test": "elm-test ./test/TestRunner.elm",
     "format": "elm-format . --yes",
-    "deploy": "gh-pages -d dist"
+    "deploy": "npm run build && gh-pages -d dist"
   },
   "author": "Simon Reinsperger <reinsperger.smn@gmail.com>",
   "license": "MIT",
